@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<launch>
+  
+  <!--
+  The automated calibration routine launch the manual calibration nodes and makes the required
+  -->
+  <include file="$(find rgbd_depth_correction)/launch/calibrate.launch" />
+  <include file="$(find robo_cylinder)/launch/robo_cylinder.launch" />
+
+  <node pkg="rgbd_depth_correction" type="automated_depth_calibration"
+  name="automated_calibration_node" output="screen"  required="true">
+    <param name="~start_rail_location" value="0.8"/>
+    <param name="~end_rail_location" value="0.0"/>
+    <param name="~data_points" value="5"/>
+  </node>
+
+</launch>

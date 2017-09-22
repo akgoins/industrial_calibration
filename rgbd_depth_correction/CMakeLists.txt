@@ -88,6 +88,9 @@ add_executable(depth_calibration src/depth_calibration.cpp)
 target_link_libraries(depth_calibration ${catkin_LIBRARIES} ${yaml_cpp_LIBRARY} ${CERES_LIBRARIES})
 add_dependencies(depth_calibration ${catkin_EXPORTED_TARGETS})
 
+add_executable(automated_depth_calibration src/automated_depth_calibration.cpp)
+target_link_libraries(automated_depth_calibration ${catkin_LIBRARIES})
+add_dependencies(automated_depth_calibration ${catkin_EXPORTED_TARGETS})
 
 install(
   TARGETS

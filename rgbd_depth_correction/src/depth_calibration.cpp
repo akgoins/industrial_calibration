@@ -82,7 +82,7 @@ DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
            target_initial_pose_.orientation.w, target_initial_pose_.orientation.x, target_initial_pose_.orientation.y, target_initial_pose_.orientation.z);
 
   pnh.param<int>("num_views", num_views_, 30);
-  pnh.param<int>("num_attempts", num_attempts_, 10);
+  pnh.param<int>("num_attempts", num_attempts_, 100);
   pnh.param<int>("point_cloud_history", num_point_clouds_, 30);
 
 
@@ -115,8 +115,6 @@ void DepthCalibrator::storeCalibration(const std::string &yaml_file, const doubl
   fout << yaml_emitter.c_str();
   fout.close();
 }
-
-
 
 bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response)
 {
