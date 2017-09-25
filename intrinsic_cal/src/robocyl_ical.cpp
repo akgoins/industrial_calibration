@@ -143,6 +143,8 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
     ROS_ERROR("Must set param:  target_to_rail_distance");
   }
 
+  ROS_INFO_STREAM("All parameters Set.");
+
   bool use_quaternion = false;
   if(pnh.getParam( "qx", qx_))
   {
@@ -170,6 +172,8 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
     ROS_WARN("home_client = %s", home_client_name.c_str());
   }
 
+  ROS_INFO_STREAM("All services Set.");
+
   move_client_  = nh.serviceClient<robo_cylinder::MoveMeters>(move_client_name);
   power_client_  = nh.serviceClient<robo_cylinder::PowerIO>(power_client_name);
   home_client_  = nh.serviceClient<robo_cylinder::HomeCmd>(home_client_name);
@@ -189,7 +193,8 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
   camera_ =  shared_ptr<industrial_extrinsic_cal::Camera>(new industrial_extrinsic_cal::Camera("my_camera", camera_parameters_, is_moving));
   camera_->trigger_ = shared_ptr<NoWaitTrigger>(new NoWaitTrigger());
   camera_->camera_observer_ = shared_ptr<ROSCameraObserver>(new ROSCameraObserver(image_topic_, camera_name_));
-  sleep(15); // wait for camera to come up or else this will fail
+  sleep(10); // wait for camera to come up or else this will fail
+
   if(!camera_->camera_observer_->pullCameraInfo(camera_->camera_parameters_.focal_length_x,
                                            camera_->camera_parameters_.focal_length_y,
                                            camera_->camera_parameters_.center_x,
@@ -219,6 +224,8 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
   initMCircleTarget(target_rows_, target_cols_, circle_diameter_, circle_spacing_);
  
   rail_cal_server_ = nh_.advertiseService( "RobocylCalService", &RobocylCalService::executeCallBack, this);
+
+  ros::service::waitForService("/move_meters", ros::Duration(20));
 }
 
 void RobocylCalService::cameraCallback(const sensor_msgs::Image &image)
@@ -239,6 +246,7 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
 {
   allowable_cost_per_observation_ = req.allowable_cost_per_observation;
   ros::NodeHandle nh;
+  ROS_INFO_STREAM("executeCallBack");
   CameraObservations camera_observations;
   robo_cylinder::MoveMeters::Request mm_request; /**< request when transform is part of a mutable set */
   robo_cylinder::MoveMeters::Response mm_response; /**< request when transform is part of a mutable set */
@@ -493,6 +501,7 @@ bool RobocylCalService::MoveAndReportPose(double rail_position, Pose6d &P)
 
 void RobocylCalService::initMCircleTarget(int rows, int cols, double circle_dia, double spacing)
 {
+  ROS_INFO_STREAM("initializing circle finder");
   target_ =  shared_ptr<industrial_extrinsic_cal::Target>(new industrial_extrinsic_cal::Target());
   target_->is_moving_ = true;
   target_->target_name_ = "modified_circle_target";
@@ -514,6 +523,7 @@ void RobocylCalService::initMCircleTarget(int rows, int cols, double circle_dia,
       target_->pts_.push_back(point);
     }
   }
+  ROS_INFO_STREAM("completed initization");
 }
 
 int main(int argc, char** argv)
