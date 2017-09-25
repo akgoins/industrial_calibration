@@ -19,7 +19,7 @@
 #include <industrial_extrinsic_cal/ros_camera_observer.h>
 #include <industrial_extrinsic_cal/circle_detector.hpp>
 #include <image_transport/image_transport.h> 
-
+#include <cv_bridge/cv_bridge.h>
 
 using cv::CircleDetector;
 namespace industrial_extrinsic_cal
@@ -133,6 +133,42 @@ void ROSCameraObserver::clearObservations()
   camera_obs_.clear();
   new_image_collected_ = false;
 }
+
+int ROSCameraObserver::getObservations(cv::Mat& image, CameraObservations &cam_obs)
+{
+  //input_bridge_->image = image.clone();
+  std_msgs::Header header;
+  if(!input_bridge_)
+  {
+    input_bridge_ = cv_bridge::CvImagePtr(new cv_bridge::CvImage(header, "mono8", image));
+  }
+  else
+  {
+    input_bridge_->image = image.clone();
+  }
+  if(!output_bridge_)
+  {
+    output_bridge_ = cv_bridge::CvImagePtr(new cv_bridge::CvImage(header, "bgr8", image));
+  }
+  else
+  {
+    output_bridge_->image = image.clone();
+  }
+  last_raw_image_ = output_bridge_->image.clone();
+  if(!out_bridge_)
+  {
+    out_bridge_ = cv_bridge::CvImagePtr(new cv_bridge::CvImage(header, "mono8", image));
+  }
+  else
+  {
+    out_bridge_->image = image.clone();
+  }
+
+  new_image_collected_ = true;
+
+  return getObservations(cam_obs);
+}
+
 int ROSCameraObserver::getObservations(CameraObservations &cam_obs)
 {
   bool successful_find = false;
@@ -645,13 +681,13 @@ void ROSCameraObserver::triggerCamera()
       catch (cv_bridge::Exception& ex)
       {
         ROS_ERROR("Failed to convert image");
-	  ROS_ERROR("height = %d width=%d step=%d encoding=%s", 
+        ROS_ERROR("height = %d width=%d step=%d encoding=%s",
 		    recent_image->height, 
 		    recent_image->width, 
 		    recent_image->step,  
 		    recent_image->encoding.c_str());
-	  ROS_WARN_STREAM("cv_bridge exception: "<<ex.what());
-	}
+        ROS_WARN_STREAM("cv_bridge exception: "<<ex.what());
+      }
     }
   }
   image_number_++;

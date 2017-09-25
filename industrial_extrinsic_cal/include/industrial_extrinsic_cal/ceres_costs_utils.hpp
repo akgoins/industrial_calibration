@@ -2350,5 +2350,50 @@ namespace industrial_extrinsic_cal
     Point3d point_; /** point expressed in target coordinates */
   };
 
+  class  RangeSensorExtrinsicCal
+  {
+  public:
+    RangeSensorExtrinsicCal(double ob_x, double ob_y, double ob_z, Point3d point) :
+      ox_(ob_x), oy_(ob_y), oz_(ob_z),
+      point_(point)
+    {
+    }
+
+    template<typename T>
+    bool operator()(	    const T* const c_p1,  /**extriniscs [6] */
+        T* residual) const
+    {
+      const T *camera_aa(& c_p1[0]); // extract camera's angle axis
+      const T *camera_tx(& c_p1[3]); // extract camera's position
+
+      /** transform point into camera frame */
+      T camera_point[3]; /** point in camera coordinates */
+      transformPoint3d(camera_aa, camera_tx, point_, camera_point);
+
+      /** compute residual */
+      residual[0] = camera_point[0] - T(ox_);
+      residual[1] = camera_point[1] - T(oy_);
+      residual[2] = camera_point[2] - T(oz_);
+
+      return true;
+    } /** end of operator() */
+
+    /** Factory to hide the construction of the CostFunction object from */
+    /** the client code. */
+    static ceres::CostFunction* Create(const double o_x, const double o_y,  const double o_z,
+               Point3d point)
+    {
+      return (new ceres::AutoDiffCostFunction<RangeSensorExtrinsicCal, 3, 6>
+        (
+         new RangeSensorExtrinsicCal(o_x, o_y, o_z, point)
+         )
+        );
+    }
+    double ox_; /** observed x location of object in 3D data */
+    double oy_; /** observed y location of object in 3D data */
+    double oz_; /** observed z location of object in 3D data */
+    Point3d point_; /** point expressed in target coordinates */
+  };
+
 } // end of namespace
 #endif

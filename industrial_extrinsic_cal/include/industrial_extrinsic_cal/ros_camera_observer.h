@@ -101,6 +101,8 @@ namespace industrial_extrinsic_cal
      */
     int getObservations(CameraObservations &camera_observations);
 
+    int getObservations(cv::Mat& image, CameraObservations &camera_observations);
+
     /** @brief tells observer to process next incomming image to find the targets in list */
     void triggerCamera();
 

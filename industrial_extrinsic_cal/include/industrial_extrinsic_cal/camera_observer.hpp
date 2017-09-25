@@ -19,6 +19,7 @@
 #ifndef CAMERA_OBSERVER_HPP_
 #define CAMERA_OBSERVER_HPP_
 
+#include <opencv2/core/core.hpp>
 #include <industrial_extrinsic_cal/basic_types.h> /* Target,Roi,Observation,CameraObservations */
 #include <industrial_extrinsic_cal/target.h> /* Roi,Observation,CameraObservations */
 #include <industrial_extrinsic_cal/ceres_costs_utils.h>
@@ -66,6 +67,10 @@ public:
   /** @brief return observations */
   /** @param output all observations of targets defined */
   virtual int getObservations(CameraObservations &camera_observations)=0;
+
+  /** @brief return observations */
+  /** @param output all observations of targets defined */
+  virtual int getObservations(cv::Mat& image, CameraObservations &camera_observations)=0;
 
   /** @brief print this object TODO */
   virtual void triggerCamera()=0;
