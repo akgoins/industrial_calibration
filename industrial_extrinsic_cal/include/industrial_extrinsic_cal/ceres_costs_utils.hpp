@@ -2372,8 +2372,8 @@ namespace industrial_extrinsic_cal
       /** transform point into camera frame */
       T camera_point[3]; /** point in camera coordinates */
       transformPoint3d(target_aa, target_tx, point_, camera_point);
-      camera_point[2] = camera_point[0] + T(rail_position_.x); // transform to camera's location along rail
-      camera_point[2] = camera_point[1] + T(rail_position_.y); // transform to camera's location along rail
+      camera_point[0] = camera_point[0] + T(rail_position_.x); // transform to camera's location along rail
+      camera_point[1] = camera_point[1] + T(rail_position_.y); // transform to camera's location along rail
       camera_point[2] = camera_point[2] + T(rail_position_.z); // transform to camera's location along rail
 
       /** compute project point into image plane and compute residual */
@@ -2525,6 +2525,7 @@ namespace industrial_extrinsic_cal
    * Solving extrinsic cal for a range sensor is equivalent to the inner computation of ICP where correspondence
    * is perfectly known. There exists an analytic solution. 
    */ 
+
   class  RangeSensorExtrinsicCal
   {
   public:
@@ -2537,6 +2538,7 @@ namespace industrial_extrinsic_cal
     template<typename T>
     bool operator()(	    const T* const c_p1,  /**extriniscs [6] */
 		    T* residual) const
+
     {
       const T *camera_aa(& c_p1[0]); // extract camera's angle axis
       const T *camera_tx(& c_p1[3]); // extract camera's position

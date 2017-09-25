@@ -277,6 +277,7 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
   mv.y = P1.y-P2.y;
   mv.z = P1.z-P2.z;
 
+
   double magnitude = sqrt(mv.x*mv.x + mv.y*mv.y + mv.z*mv.z);
   if(magnitude>0.0){
     mv.x = mv.x/magnitude;
@@ -288,7 +289,7 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
     mv.y = 0;
     mv.z = 1;
   }
-  
+    ROS_ERROR("%lf %lf %lf",mv.x, mv.y, mv.z);
   // set the roi to the whole image
   Roi roi;
   roi.x_min = 0;

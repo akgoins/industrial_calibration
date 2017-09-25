@@ -116,6 +116,8 @@ catkin_package(
     std_srvs
     tf
     tf_conversions
+    pcl_ros
+    pcl_conversions
   DEPENDS
     Boost
     CERES
@@ -175,6 +177,7 @@ add_executable(trigger_service                  src/nodes/ros_scene_trigger_serv
 add_executable(range_excal                      src/nodes/range_camera_excal.cpp)
 add_executable(rangeNmono                       src/nodes/rangeNmono_excal.cpp)
 add_executable(inkTest                          src/nodes/inktest.cpp)
+add_executable(rgb_depth_excal                  src/nodes/rgb_depth_excal.cpp)
 
 add_dependencies(camera_observer_scene_trigger    ${catkin_EXPORTED_TARGETS} ${industrial_extrinsic_cal_EXPORTED_TARGETS})
 add_dependencies(mutable_joint_state_publisher    ${catkin_EXPORTED_TARGETS} ${industrial_extrinsic_cal_EXPORTED_TARGETS})
@@ -184,6 +187,8 @@ add_dependencies(trigger_service                  ${catkin_EXPORTED_TARGETS} ${i
 add_dependencies(range_excal                  ${catkin_EXPORTED_TARGETS} ${industrial_extrinsic_cal_EXPORTED_TARGETS})
 add_dependencies(rangeNmono                  ${catkin_EXPORTED_TARGETS} ${industrial_extrinsic_cal_EXPORTED_TARGETS})
 add_dependencies(inkTest                  ${catkin_EXPORTED_TARGETS} ${industrial_extrinsic_cal_EXPORTED_TARGETS})
+add_dependencies(rgb_depth_excal                  ${catkin_EXPORTED_TARGETS} ${industrial_extrinsic_cal_EXPORTED_TARGETS})
+
 
 target_link_libraries(camera_observer_scene_trigger industrial_extrinsic_cal ${catkin_LIBRARIES} ${yaml_cpp_LIBRARY} ${CERES_LIBRARIES})
 target_link_libraries(manual_calt_adjust industrial_extrinsic_cal ${catkin_LIBRARIES})
@@ -196,6 +201,7 @@ target_link_libraries(trigger_service ${catkin_LIBRARIES})
 target_link_libraries(range_excal industrial_extrinsic_cal ${CERES_LIBRARIES})
 target_link_libraries(rangeNmono industrial_extrinsic_cal ${CERES_LIBRARIES})
 target_link_libraries(inkTest industrial_extrinsic_cal ${CERES_LIBRARIES})
+target_link_libraries(rgb_depth_excal industrial_extrinsic_cal ${CERES_LIBRARIES})
 
 install(
   TARGETS
@@ -209,6 +215,7 @@ install(
     trigger_service
     range_excal
     rangeNmono
+    rgb_depth_excal
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
