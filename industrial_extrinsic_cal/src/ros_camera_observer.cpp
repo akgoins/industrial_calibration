@@ -669,7 +669,13 @@ void ROSCameraObserver::triggerCamera()
       ROS_DEBUG("captured image in trigger");
       try
       {
-        input_bridge_ = cv_bridge::toCvCopy(recent_image, "mono8");
+        if(recent_image->encoding == "mono16"){  // asus and kinect ir images are mono16, bridge mishandles conversion to mono8
+          input_bridge_ = cv_bridge::toCvCopy(recent_image, "mono16");
+          input_bridge_->image.convertTo(input_bridge_->image, CV_8UC1, 1.0, 0.0);
+        }
+        else{
+          input_bridge_ = cv_bridge::toCvCopy(recent_image, "mono8");
+        }
         output_bridge_ = cv_bridge::toCvCopy(recent_image, "bgr8");
         last_raw_image_ = output_bridge_->image.clone();
         out_bridge_ = cv_bridge::toCvCopy(recent_image, "mono8");
