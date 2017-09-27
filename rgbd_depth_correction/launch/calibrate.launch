@@ -21,10 +21,10 @@
       image_topic: "/camera/rgb/image_rect_color"
       camera_name: "/camera/rgb"
       target_type: 2
-      target_rows: 7
-      target_cols: 5
-      target_circle_dia: 0.05
-      target_spacing: 0.07
+      target_rows: 18
+      target_cols: 24
+      target_circle_dia: 0.015
+      target_spacing: 0.025
       use_circle_detector: true
     </rosparam>
   </node>

@@ -52,7 +52,7 @@ int main(int argc, char  *argv[])
   ROS_INFO_STREAM("Moving Rail to start_location: " << start_rail_location);
   //move to start position
   robo_cylinder::MoveMeters move_service;
-  move_service.request.meters = start_rail_location;
+  move_service.request.meters = (start_rail_location-end_rail_location)/2;
   while(1){
       if(move_rail_client.call(move_service)){
           std_srvs::Empty start_cal_service;
@@ -86,9 +86,10 @@ int main(int argc, char  *argv[])
   std_srvs::Empty solve_cal_service;
   if(!solve_calibration_client.call(solve_cal_service)){
     ROS_ERROR_STREAM("Solve Calibration Service call failed. Shutting down :(");
-    ros::shutdown();
+    //ros::shutdown();
   }
-  ROS_INFO_STREAM("Calibration calculation complete.");
+  else
+    ROS_INFO_STREAM("Calibration calculation complete.");
 
 
   ros::spin();

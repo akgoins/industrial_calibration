@@ -91,13 +91,13 @@ DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
   calibrate_pixel_depth_ = nh_.advertiseService("pixel_depth_calibration", &DepthCalibrator::calibrateCameraPixelDepth, this);
   set_store_cloud_ = nh_.advertiseService("store_cloud", &DepthCalibrator::setStoreCloud, this);
   get_target_pose_ = nh.serviceClient<target_finder::target_locater>("TargetLocateService");
-  /*
+
   this->point_cloud_sub_ = boost::shared_ptr<PointCloudSubscriberType>(new PointCloudSubscriberType(nh, "depth_points", 1));
   this->image_sub_ = boost::shared_ptr<ImageSubscriberType>(new ImageSubscriberType(nh, "image", 1));
-  synchronizer_ = boost::shared_ptr<SynchronizerType>(new SynchronizerType(PolicyType(10),
-    *this->point_cloud_sub_, *this->image_sub_));
-  synchronizer_->registerCallback(boost::bind(&DepthCalibrator::updateInputData, this, _1, _2));
-  */
+  //synchronizer_ = boost::shared_ptr<SynchronizerType>(new SynchronizerType(PolicyType(10),
+  //  *this->point_cloud_sub_, *this->image_sub_));
+  //synchronizer_->registerCallback(boost::bind(&DepthCalibrator::updateInputData, this, _1, _2));
+
 }
 
 void DepthCalibrator::storeCalibration(const std::string &yaml_file, const double dp[2])
@@ -183,38 +183,22 @@ bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, st
 bool DepthCalibrator::findAveragePointCloud(pcl::PointCloud<pcl::PointXYZ>& final_cloud)
 {
   // Store point clouds until the number of point clouds desired is reached, break if no new data is received after 1 second
-  int rate = 100;
   std::vector< pcl::PointCloud<pcl::PointXYZ>, Eigen::aligned_allocator<pcl::PointCloud<pcl::PointXYZ> > > temp_clouds;
-  ros::Rate sleep_rate(rate);
   while(temp_clouds.size() < num_point_clouds_)
   {
-    ros::Time new_time = ros::Time::now();
-    int count = 0;
-    while(count < rate )
-    {
-      {
-        boost::lock_guard<boost::mutex> lock(data_lock_);
-        std_msgs::Header ros_cloud_header;
-        pcl_conversions::fromPCL(last_cloud_.header, ros_cloud_header);
-        final_cloud = last_cloud_;
-        if(ros_cloud_header.stamp > new_time)
-        {
-          ROS_INFO("Got point cloud %lu of %d", (temp_clouds.size() + 1), num_point_clouds_ );
-          temp_clouds.push_back(last_cloud_);
-          break;
-        }
 
-      }
-      sleep_rate.sleep();
-      ++count;
-    }
 
-    if(count == rate)
-    {
-      ROS_ERROR("No new point cloud data after 1 second");
-      return false;
-    }
+    sensor_msgs::PointCloud2 pc;
+    pc  = *(ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/camera/depth_registered/points",ros::Duration(10)));
+    pcl::fromROSMsg(pc, last_cloud_);
+
+    final_cloud = last_cloud_;
+    ROS_INFO("Got point cloud %lu of %d", (temp_clouds.size() + 1), num_point_clouds_ );
+    temp_clouds.push_back(last_cloud_);
   }
+
+  //sensor_msgs::Image image;
+  last_image_  = *(ros::topic::waitForMessage<sensor_msgs::Image>("/camera/rgb/image_rect_color",ros::Duration(10)));
 
   final_cloud.points.clear();
 
@@ -292,7 +276,6 @@ bool DepthCalibrator::calibrateCameraPixelDepth(std_srvs::Empty::Request &reques
   correction_cloud_.height = avg_cloud.height;
   for(int j = 0; j < avg_cloud.points.size(); ++j)
   {
-
     if(std::isnan(avg_cloud.points.at(j).x) || avg_cloud.points.at(j).z == 0)
     {
       pcl::PointXYZ pt;
@@ -304,9 +287,9 @@ bool DepthCalibrator::calibrateCameraPixelDepth(std_srvs::Empty::Request &reques
     }
     // calculated (ideal) depth using plane equation (ax + by + cz + d = 0)
     double ideal_depth = (-plane_eq[3] - plane_eq[0]*avg_cloud.points.at(j).x - plane_eq[1]*avg_cloud.points.at(j).y) / plane_eq[2];
-
     // depth correction value is error between calculated depth and average depth for the given pixel
     double error = (ideal_depth - avg_cloud.points.at(j).z);
+
 
     if(fabs(error) > depth_error_threshold_)
     {
@@ -329,6 +312,7 @@ bool DepthCalibrator::calibrateCameraPixelDepth(std_srvs::Empty::Request &reques
 
   // Iterate through depth correction cloud and replace all NaNs with average value of neighbors
   // Repeat until no NaNs remain
+
   bool done = false;
   while(!done)
   {
@@ -448,7 +432,7 @@ bool DepthCalibrator::setStoreCloud(std_srvs::Empty::Request &request, std_srvs:
   }
   return true;
 }
-
+/*
 void DepthCalibrator::updateInputData(const sensor_msgs::PointCloud2ConstPtr& cloud, const sensor_msgs::ImageConstPtr &image)
 {
   boost::lock_guard<boost::mutex> lock(data_lock_);
@@ -459,7 +443,7 @@ void DepthCalibrator::updateInputData(const sensor_msgs::PointCloud2ConstPtr& cl
   temp_cloud.is_dense = false;
   pcl::fromROSMsg(temp_cloud, last_cloud_);
 }
-
+*/
 bool DepthCalibrator::findAveragePlane(std::vector<double>& plane_eq, geometry_msgs::Pose& target_pose)
 {
   bool rtn = false;

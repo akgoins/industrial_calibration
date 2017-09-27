@@ -4,7 +4,14 @@
   <!--
   The automated calibration routine launch the manual calibration nodes and makes the required
   -->
-  <include file="$(find rgbd_depth_correction)/launch/calibrate.launch" />
+
+
+
+  <include file="$(find rgbd_depth_correction)/launch/calibrate.launch">
+    <arg name="file" value="1504070740" />
+    <param name="num_views" value="5"/>
+  </include>
+
   <include file="$(find robo_cylinder)/launch/robo_cylinder.launch" />
 
   <node pkg="rgbd_depth_correction" type="automated_depth_calibration"
