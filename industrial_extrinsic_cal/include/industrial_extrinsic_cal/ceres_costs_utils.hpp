@@ -2361,8 +2361,8 @@ namespace industrial_extrinsic_cal
 
     template<typename T>
     bool operator()(	    const T* const c_p1,  /**intrinsics [9] */
-		    const T* const c_p2,  /**target_pose [6] */
-		    T* residual) const
+			    const T* const c_p2,  /**target_pose [6] */
+			    T* residual) const
     {
       T fx, fy, cx, cy, k1, k2, k3, p1, p2;      // extract intrinsics
       extractCameraIntrinsics(c_p1, fx, fy, cx, cy, k1, k2, k3, p1, p2);
@@ -2405,7 +2405,7 @@ namespace industrial_extrinsic_cal
   {
   public:
     DistortedCameraFinder(double ob_x, double ob_y, double fx, double fy,
-                     double cx, double cy, double k1, double k2, double k3, double p1, double p2,
+			  double cx, double cy, double k1, double k2, double k3, double p1, double p2,
                           Point3d point) :
         ox_(ob_x), oy_(ob_y), fx_(fx), fy_(fy), cx_(cx), cy_(cy),
         k1_(k1), k2_(k2), k3_(k3), p1_(p1), p2_(p2),

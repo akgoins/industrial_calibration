@@ -184,8 +184,15 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
 
   if(!use_quaternion)
   {
-    qx_ = 1.0;
-    qy_ = qz_ = qw_ = 0.0;
+    tf::Matrix3x3 m;
+    m[0][0] = 1; m[0][1] =   0; m[0][2] = 0;
+    m[1][0] = 0; m[1][1] = -1.; m[1][2] = 0;
+    m[2][0] = 0; m[2][1] =   0; m[2][2] = -1;
+    Pose6d Ptemp;
+    Ptemp.setBasis(m);
+    Ptemp.setOrigin(-0.1, -0.1, D0_);
+    Ptemp.getQuaternion(qx_, qy_, qz_, qw_);
+    Ptemp.show("initial pose");
     ROS_WARN("parameters qx, qy, qz, and qw not provided, using default values of (%.2f, %.2f, %.2f, %.2f)", qx_, qy_, qz_, qw_);
   }
 
@@ -269,27 +276,16 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
   power_client_.call(pio_request, pio_response);
   home_client_.call(hc_request, hc_response);
 
-  Pose6d P1,P2;
-  MoveAndReportPose(0.0,P1);
-  MoveAndReportPose((num_camera_locations_-1)*camera_spacing_,P2);
-  Point3d mv; // motion vector
-  mv.x = P1.x-P2.x;
-  mv.y = P1.y-P2.y;
-  mv.z = P1.z-P2.z;
-
-
-  double magnitude = sqrt(mv.x*mv.x + mv.y*mv.y + mv.z*mv.z);
-  if(magnitude>0.0){
-    mv.x = mv.x/magnitude;
-    mv.y = mv.y/magnitude;
-    mv.z = mv.z/magnitude;
-  }
-  else{
-    mv.x = 0;
-    mv.y = 0;
-    mv.z = 1;
-  }
-    ROS_ERROR("%lf %lf %lf",mv.x, mv.y, mv.z);
+  Pose6d TtoC1, TtoC2; // transforms points in target frame into either Camera1 or Camera2 frames
+  Pose6d C1toT, C2toT; // transforms points in camera1,2 frames into Target Frame
+  Pose6d C2toC1; // transform points in camera2 frame into camera1 frame 
+  MoveAndReportPose(0.0,TtoC1);
+  MoveAndReportPose((num_camera_locations_-1)*camera_spacing_,TtoC2);
+  C2toT = TtoC2.getInverse(); // this transform points in C2 frame into Target frame
+  C2toC1 = TtoC1*C2toT; // this transforms points in C2 frame into Target then into C1 frame as one multiply
+  tf::Vector3 mv = C2toC1.getOrigin(); // the origin is the vector in C1 coordinates
+  mv.normalize();
+  
   // set the roi to the whole image
   Roi roi;
   roi.x_min = 0;
@@ -310,9 +306,9 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
   for(int i=0; i<num_camera_locations_; i++){
     double Dist = i*camera_spacing_;
     Point3d rail_position;
-    rail_position.x = Dist*mv.x;
-    rail_position.y = Dist*mv.y;
-    rail_position.z = Dist*mv.z;
+    rail_position.x = Dist*mv.getX();
+    rail_position.y = Dist*mv.getY();
+    rail_position.z = Dist*mv.getZ();
         
     ROS_INFO("moving to %lf",Dist);
     mm_request.meters = Dist;
@@ -337,7 +333,7 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
     for(int i=0; i<num_observations; i++){
       double image_x = camera_observations[i].image_loc_x;
       double image_y = camera_observations[i].image_loc_y;
-      Point3d point = target_->pts_[i]; // assume correct ordering from camera observer
+      Point3d point = target_->pts_[camera_observations[i].point_id]; // don't assume ordering from camera observer
       cost_function[i] = industrial_extrinsic_cal::RailICal3::Create(image_x, image_y, rail_position, point);
       problem.AddResidualBlock(cost_function[i], NULL ,
              camera_->camera_parameters_.pb_intrinsics,
@@ -466,7 +462,7 @@ bool RobocylCalService::MoveAndReportPose(double rail_position, Pose6d &P)
   for(int i=0; i<num_observations; i++){
     double image_x = camera_observations[i].image_loc_x;
     double image_y = camera_observations[i].image_loc_y;
-    Point3d point = target_->pts_[i]; // assume correct ordering from camera observer
+    Point3d point = target_->pts_[camera_observations[i].point_id]; // don't assume ordering from camera observer
     cost_function[i] =  industrial_extrinsic_cal::DistortedCameraFinder::Create(image_x, image_y, fx, fy, cx, cy, k1, k2, k3, p1, p2, point);
     problem.AddResidualBlock(cost_function[i], NULL, pose.pb_pose);
   } 
@@ -483,7 +479,7 @@ bool RobocylCalService::MoveAndReportPose(double rail_position, Pose6d &P)
     double final_cost = summary.final_cost/total_observations;
     if(final_cost <= allowable_cost_per_observation_){
       ROS_INFO("Found Pose, initial cost = %lf, final cost = %lf", initial_cost, final_cost);
-      target_->pose_.show("target_pose");
+      pose.show("Returned Pose");
       P = pose;
       return true;
     }

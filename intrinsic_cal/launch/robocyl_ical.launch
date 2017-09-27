@@ -11,12 +11,12 @@
   <node pkg="intrinsic_cal" type="robocyl_ical" name="robocyl_intrinsic_calibration" output="screen" >
           <param name="image_topic" value="/camera/rgb/image_raw" />
           <param name="camera_name" value="camera/rgb" />
-          <param name="target_rows" value="7" />
-          <param name="target_cols" value="5" />
-          <param name="target_circle_dia" value=".05" />
-          <param name="target_spacing" value=".07" />
-          <param name="num_camera_locations" value="16" />
-          <param name="camera_spacing" value=".050" />
+          <param name="target_rows" value="18" />
+          <param name="target_cols" value="24" />
+          <param name="target_circle_dia" value="0.015" />
+          <param name="target_spacing" value="0.025" />
+          <param name="num_camera_locations" value="8" />
+          <param name="camera_spacing" value=".010" />
           <param name="image_height" value="480" />
           <param name="image_width" value="640" />
           <param name="target_to_rail_distance" value="2.0" />
