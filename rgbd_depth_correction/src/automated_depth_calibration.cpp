@@ -37,7 +37,7 @@ int main(int argc, char  *argv[])
       ros::shutdown();
   }
 
-  std::vector<float> rail_locations = generate_points(start_rail_location, end_rail_location, data_points);
+
 
   //wait 20 seconds for robo cylinder to launch
   ros::service::waitForService("/move_meters", ros::Duration(20));
@@ -56,7 +56,7 @@ int main(int argc, char  *argv[])
   while(1){
       if(move_rail_client.call(move_service)){
           std_srvs::Empty start_cal_service;
-          ROS_INFO_STREAM("Starting calibration service");
+          ROS_INFO_STREAM("Starting calibration service and collecting mid point point cloud at " << move_service.request.meters);
           if(start_depth_calibration_client.call(start_cal_service))
               break; //this means the rail is at the position and the call work so continue on after this while(1)
           else{
@@ -65,6 +65,9 @@ int main(int argc, char  *argv[])
           }
       }
   }
+
+  std::vector<float> rail_locations = generate_points(start_rail_location, end_rail_location, data_points);
+
   for (std::vector<float>::iterator it = rail_locations.begin() ; it != rail_locations.end(); ++it){
     ROS_INFO_STREAM("commanding rail to  " << *it);
     while(1){
