@@ -68,6 +68,7 @@ add_service_files(
     set_mutable_joint_states.srv
     store_mutable_joint_states.srv
     user_accept.srv
+    find_target.srv
 )
 
 add_action_files(

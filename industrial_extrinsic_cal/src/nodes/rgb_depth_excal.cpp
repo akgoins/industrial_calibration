@@ -31,12 +31,14 @@
 #include <industrial_extrinsic_cal/calibrationAction.h>
 #include <industrial_extrinsic_cal/calibrate.h>
 #include <industrial_extrinsic_cal/covariance.h>
+#include <industrial_extrinsic_cal/find_target.h>
 #include <industrial_extrinsic_cal/camera_definition.h>
 #include <industrial_extrinsic_cal/ros_transform_interface.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+#include <tf/tf.h>
 #include "ceres/ceres.h"
 #include "ceres/rotation.h"
 #include "ceres/types.h"
@@ -61,7 +63,7 @@ public:
 
   RangeExCalService(ros::NodeHandle nh);
   ~RangeExCalService()  {  } ;
-  bool executeCallBack( industrial_extrinsic_cal::calibrate::Request &req, industrial_extrinsic_cal::calibrate::Response &res);
+  bool executeCallBack( industrial_extrinsic_cal::find_target::Request &req, industrial_extrinsic_cal::find_target::Response &res);
   bool actionCallback(const industrial_extrinsic_cal::calibrationGoalConstPtr& goal);
   void  initMCircleTarget(int rows, int cols, double circle_dia, double spacing);
   void interpolate(double l, double m, double u, double lv, double &mv, double uv)
@@ -163,8 +165,8 @@ action_server_(nh_,"run_calibration",boost::bind(&RangeExCalService::actionCallb
 
 bool RangeExCalService::actionCallback(const industrial_extrinsic_cal::calibrationGoalConstPtr& goal)
 {
-  industrial_extrinsic_cal::calibrate::Request request;
-  industrial_extrinsic_cal::calibrate::Response response;
+  industrial_extrinsic_cal::find_target::Request request;
+  industrial_extrinsic_cal::find_target::Response response;
   request.allowable_cost_per_observation = goal->allowable_cost_per_observation;
   if(executeCallBack(request, response)){
     action_server_.setSucceeded();
@@ -173,8 +175,8 @@ bool RangeExCalService::actionCallback(const industrial_extrinsic_cal::calibrati
   action_server_.setAborted();
   return(false);
 }
-bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::calibrate::Request &req, 
-					 industrial_extrinsic_cal::calibrate::Response &res)
+bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::Request &req,
+           industrial_extrinsic_cal::find_target::Response &res)
 {
   ros::NodeHandle nh;
   CameraObservations camera_observations;
@@ -327,9 +329,40 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::calibrate::Re
 
   if(summary.termination_type != ceres::NO_CONVERGENCE
      ){
+    // Set final cost and error
     double error_per_observation = summary.final_cost/num_observations;
     res.cost_per_observation  = error_per_observation;
     ROS_INFO("cost per observation = %f", error_per_observation);
+    res.percent_error = error;
+
+    // calculate target pose from camera pose
+    tf::Transform camera_trans;
+    tf::Vector3 position;
+    tf::Quaternion orientation;
+    position.setX(camera_->camera_parameters_.position[0]);
+    position.setY(camera_->camera_parameters_.position[1]);
+    position.setZ(camera_->camera_parameters_.position[2]);
+    camera_trans.setOrigin(position);
+    double x, y, z, w;
+    Pose6d temp_pose(camera_->camera_parameters_.position[0], camera_->camera_parameters_.position[1], camera_->camera_parameters_.position[2],
+        camera_->camera_parameters_.angle_axis[0], camera_->camera_parameters_.angle_axis[1], camera_->camera_parameters_.angle_axis[2]);
+    temp_pose.getQuaternion(x, y, z, w);
+    orientation.setX(x);
+    orientation.setY(y);
+    orientation.setZ(z);
+    orientation.setW(w);
+    camera_trans.setRotation(orientation);
+    tf::Transform target_trans = camera_trans.inverse();
+
+    // populate return message
+    res.final_pose.position.x = target_trans.getOrigin().getX();
+    res.final_pose.position.y = target_trans.getOrigin().getY();
+    res.final_pose.position.z = target_trans.getOrigin().getZ();
+    res.final_pose.orientation.w = target_trans.getRotation().getW();
+    res.final_pose.orientation.x = target_trans.getRotation().getX();
+    res.final_pose.orientation.y = target_trans.getRotation().getY();
+    res.final_pose.orientation.z = target_trans.getRotation().getZ();
+
     if(error_per_observation <= req.allowable_cost_per_observation){
       camera_->pushTransform();
       return true;
