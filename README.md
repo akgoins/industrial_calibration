@@ -57,6 +57,7 @@ roslaunch rgbd_depth_correction correction.launch file:=<insert serial number>
 apply changes
 ```
 rosservice call /calibration_service "allowable_cost_per_observation: 1.0"
+```
 ## Save files
 1. save <serial number>.yaml and <serial number>.pcd to data folder
 2. take screen shots in rviz and save to data folder

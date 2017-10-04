@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   target_finder
   tf
   tf_conversions
+  robo_cylinder
 )
 
 
@@ -66,6 +67,7 @@ catkin_package(
     target_finder
     tf
     tf_conversions
+    robo_cylinder
   DEPENDS
     Boost
     CERES

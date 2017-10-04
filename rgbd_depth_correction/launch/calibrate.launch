@@ -13,21 +13,7 @@
     <arg name="depth_camera_info_url" value="file://$(find rgbd_depth_correction)/yaml/$(arg file)_ir.yaml" />
   </include>
 
-
-  <node pkg="target_finder" type="target_locator_srv" name="target_locator_service" output="screen" >
-
-    <!-- Be sure to use RGB projection matrix parameters here after performing intrinsic calibration -->
-    <rosparam>
-      image_topic: "/camera/rgb/image_rect_color"
-      camera_name: "/camera/rgb"
-      target_type: 2
-      target_rows: 18
-      target_cols: 24
-      target_circle_dia: 0.015
-      target_spacing: 0.025
-      use_circle_detector: true
-    </rosparam>
-  </node>
+  <include file="$(industrial_extrinsic_cal)/launch/rgbd_cal_test.launch"/>
 
   <node pkg="rgbd_depth_correction" type="depth_calibration" name="depth_cal_node" output="screen" >
     <remap from="depth_points" to="/camera/depth_registered/points" />

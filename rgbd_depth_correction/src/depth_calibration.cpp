@@ -30,6 +30,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <industrial_extrinsic_cal/find_target.h>
 
 
 
@@ -90,7 +91,7 @@ DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
   calibrate_depth_ = nh_.advertiseService("depth_calibration", &DepthCalibrator::calibrateCameraDepth, this);
   calibrate_pixel_depth_ = nh_.advertiseService("pixel_depth_calibration", &DepthCalibrator::calibrateCameraPixelDepth, this);
   set_store_cloud_ = nh_.advertiseService("store_cloud", &DepthCalibrator::setStoreCloud, this);
-  get_target_pose_ = nh.serviceClient<target_finder::target_locater>("TargetLocateService");
+  get_target_pose_ = nh.serviceClient<industrial_extrinsic_cal::find_target>("RoboExCalService");
 
   this->point_cloud_sub_ = boost::shared_ptr<PointCloudSubscriberType>(new PointCloudSubscriberType(nh, "depth_points", 1));
   this->image_sub_ = boost::shared_ptr<ImageSubscriberType>(new ImageSubscriberType(nh, "image", 1));
@@ -537,24 +538,18 @@ bool DepthCalibrator::findTarget(const double &final_cost, geometry_msgs::Pose& 
 {
   bool rtn = true;
   //Get target pose
-  target_finder::target_locaterRequest target_request;
-  target_finder::target_locaterResponse target_response;
+  industrial_extrinsic_cal::find_target::Request target_request;
+  industrial_extrinsic_cal::find_target::Response target_response;
   target_request.allowable_cost_per_observation = 5000.0;
-  target_request.roi.height = 480;
-  target_request.roi.width = 640;
-  target_request.roi.do_rectify = false;
-  target_request.roi.x_offset = 0;
-  target_request.roi.y_offset = 0;
-  target_request.initial_pose = target_initial_pose_;
 
   if(!get_target_pose_.call(target_request, target_response))
   {
     ROS_ERROR("Failed to get target pose.");
     rtn = false;
   }
-  else if(target_response.final_cost_per_observation > final_cost)
+  else if(target_response.cost_per_observation > final_cost)
   {
-    ROS_ERROR("Target pose error too large (%.3f).", target_response.final_cost_per_observation);
+    ROS_ERROR("Target pose error too large (%.3f).", target_response.cost_per_observation);
     rtn = false;
   }
 
