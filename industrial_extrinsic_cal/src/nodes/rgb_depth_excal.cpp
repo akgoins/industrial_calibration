@@ -204,6 +204,10 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::
   // get the range data from the 3D camera
   boost::shared_ptr<sensor_msgs::PointCloud2 const> msg;
   msg  = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(cloud_topic_, ros::Duration(10));
+  if(!msg){
+    ROS_ERROR_STREAM("No point cloud recieved");
+    return false;
+  }
   ROS_INFO("Received point cloud of size %d X %d", msg->width, msg->height);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud( new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::fromROSMsg(*msg, *cloud);
