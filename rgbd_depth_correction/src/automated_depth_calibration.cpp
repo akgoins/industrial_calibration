@@ -49,7 +49,6 @@ int main(int argc, char  *argv[])
   ros::ServiceClient add_calibration_data_client = nh.serviceClient<std_srvs::Empty>("/store_cloud");
   ros::ServiceClient solve_calibration_client = nh.serviceClient<std_srvs::Empty>("/depth_calibration");
 
-  ROS_INFO_STREAM("Moving Rail to start_location: " << start_rail_location);
   //move to start position
   robo_cylinder::MoveMeters move_service;
   move_service.request.meters = (start_rail_location-end_rail_location)/2;

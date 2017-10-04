@@ -7,7 +7,6 @@
 
   <include file="$(find rgbd_depth_correction)/launch/calibrate.launch">
     <arg name="file" value="1504101060" />
-    <param name="num_views" value="5"/>
   </include>
 
   <include file="$(find robo_cylinder)/launch/robo_cylinder.launch" />

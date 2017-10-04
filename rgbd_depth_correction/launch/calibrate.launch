@@ -8,17 +8,16 @@
     <arg name="publish_tf" value="true" />
     <arg name="camera" value="camera" />
     <arg name="depth_registration" default="true" />
-    <!--arg name="device_id" value="3@1"/-->
     <arg name="rgb_camera_info_url"   value="file://$(find rgbd_depth_correction)/yaml/$(arg file)_rgb.yaml" />
     <arg name="depth_camera_info_url" value="file://$(find rgbd_depth_correction)/yaml/$(arg file)_ir.yaml" />
   </include>
 
-  <include file="$(industrial_extrinsic_cal)/launch/rgbd_cal_test.launch"/>
+  <include file="$(find industrial_extrinsic_cal)/launch/rgbd_cal_test.launch"/>
 
   <node pkg="rgbd_depth_correction" type="depth_calibration" name="depth_cal_node" output="screen" >
     <remap from="depth_points" to="/camera/depth_registered/points" />
     <remap from="image" to="/camera/rgb/image_rect_color" />
-
+    <param name="num_views" value="5"/>
     <param name="filepath" value="$(find rgbd_depth_correction)/yaml" />
     <param name="filename" value="$(arg file)" />
 
