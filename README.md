@@ -1,6 +1,24 @@
-# Serial Number checks
+# Software Setup
+TODO Change diretory into calibration workspace
+
+Teminal 1:
+cd ros/cal_ws/
+
+
+## Serial Number checks
+check serial number on hardwarde against the software using the command:
+in terminal 1:
+```
+roslaunch openni2_launch openni2.launch
+```
+terminal 2:
+```
+source devel/setup.bash
+rosservice call /camera/get_serial
+```
 
 # Hardware setup
+if you get an error of `serial.serialutil.SerialException: [Errno 13] could not open port /dev/ttyUSB0: [Errno 13] Permission denied: '/dev/ttyUSB0'` then run the command:
 ```
 sudo chmod a+xwr /dev/ttyUSB0
 ```
@@ -16,17 +34,41 @@ Save the file and exit or if the file does not exist copy PS1080.ini from the pr
 
 Verify the depth correction is turned off by running the openni2.launch, you should see a difference in the point cloud.  With the GMCMode  line commented out, you will see several "vertical" lines in the point cloud.  This is due to some optimization that is trying to smooth out the data.  With the line uncommented, the lines should go away.  If you don't know what you are looking for, come grab me and I can show you.
 
+## Centering cameras
+<TODO: Move rail to the front launch the rail:
+```
+terminal 1:
+source devel/setup.bash
+roslaunch robo_cylinder robo_cylinder.launch
+
+terminal 2:
+ rosservice call /move_meters "meters: 0.8"
+```
+launch the camera
+```
+roslaunch openni2_launch openni2.launch
+```
+view in rviz
+```
+rviz
+```
+once in rviz add an image and select the IR or RGB image topic
+
 
 # Calibrate the RGB Camera
 ## Run the calibration
 in terminal 1 run:
 ```
-roslaunch intrinsic_cal rgb_auto.launch 
+source devel/setup.bash
+roslaunch intrinsic_cal rgb_auto.launch  
 ```
+
 in terminal 2 run:
 ```
+source devel/setup.bash
 rosservice call /RobocylCalService "allowable_cost_per_observation: 1.0"
 ```
+Wait for Writing Calibration data to /home/ros/.ros/camera_info/rgb_PS1080_PrimeSense.yaml
 
 ## Save the files
 Copy the new file which is located at ~/.ros/camera_info/depth_PS1080_PrimeSense.yaml. rename the copied file to <serial number>_rgb.yaml and place in two folders:
@@ -35,13 +77,20 @@ Copy the new file which is located at ~/.ros/camera_info/depth_PS1080_PrimeSense
 
 
 # Calibrate the IR Camera
+## Hardware Setup
+1. Cover Projector
+2. Turn on lights
+
 ## Run the calibration
 in terminal 1 run:
 ```
+source devel/setup.bash
 roslaunch intrinsic_cal ir_auto.launch 
 ```
+
 in terminal 2 run:
 ```
+source devel/setup.bash
 rosservice call /RobocylCalService "allowable_cost_per_observation: 1.0"
 ```
 ## save the files
@@ -51,16 +100,27 @@ Copy the new file which is located at ~/.ros/camera_info/depth_PS1080_PrimeSense
 
 
 # Test the Calibrations
-edit the launch file to specify the location of the ir and rgb cameras.
+Uncover Projector turn off lights
+
 In terminal 1 run:
 ```
-roslaunch industrial_extrinsic_cal rgbd_cal_test.launch
+
+roslaunch industrial_extrinsic_cal rgbd_cal_verify.launch serial_number:=<insert serial number>
 ```
-in terminal 2 run open rviz and display the pointcloud2 and tf
+in terminal 2 run:
+```
+rviz -d ~/plusone\ data/ir_rgb_validation.rviz
+```
+
+
 in terminal 3 run: 
 ```
-rosservice call /RoboExCalService "allowable_cost_per_observation: 1.0"
+source devel/setup.bash
+rosservice call /RangeExCalService "allowable_cost_per_observation: 1.0"
 ```
+<TODO: what to look for in which terminal>
+a passing number is less than 2.000 percent error. If it is over run cal again. 
+save the terminal 1 data in the data folder under the filename ir_rgb_validation_results.txt
 
 ## Depth Correction
 
@@ -79,6 +139,7 @@ roslaunch robo_cylinder robo_cylinder.launch
 ### Start the calibration
 Step 1, set the camera approximatly 4ft from the wall and initialize the calibration. in terminal 3 run the following:
 ```
+source devel/setup.bash
 rosservice call /move_meters "meters: 0.4"
 rosservice call /pixel_depth_calibration "{}"
 ```
@@ -86,7 +147,7 @@ view terminal 1 and make sure it solves
 
 step 2. in terminal 3 run the following
 ```
-rosservice call /move_meters "meters: 0.8"
+rosservice call /move_meters "meters: 0.7"
 rosservice call /store_cloud "{}" 
 ```
 view terminal 1 and make sure it solves
@@ -97,17 +158,23 @@ Step 4.  process the gathered point clouds. in terminal 3 run:
 ```
 rosservice call /depth_calibration "{}"
 ``` 
-Step 5.  save results, the location is displayes in terminal 1. rename the output pcd and yaml file to the serial number of the camera
+Step 5.  save results, the location is displayes in terminal 1. rename the output pcd and yaml file to the serial number of the camera.
+
+ Note if it says writing calibration data to file it has passed.
+
 ## Validate results
 
-launch corrected point clouds (ensure the node reads the correct files from Step 5:)
+launch corrected point clouds (ensure the node reads the correct files from Step 5:) by entering the following in terminal 1:
 ```
 roslaunch rgbd_depth_correction correction.launch file:=<insert serial number>
 ```
-apply changes
+apply changes by entering the following in terminal 2:
 ```
-rosservice call /calibration_service "allowable_cost_per_observation: 1.0"
+rosservice call /RangeExCalService "allowable_cost_per_observation: 1.0"
 ```
+
+save the terminal 1 output to depth_calibration_results.txt and take 2 photos
+
 ## Save files
 1. save <serial number>.yaml and <serial number>.pcd to data folder
 2. take screen shots in rviz and save to data folder
