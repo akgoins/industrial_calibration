@@ -176,7 +176,8 @@ void RobocylCalService::manualCal()
     ROS_WARN_STREAM("SET RAIL TO 0 then enter the command: \nrostopic pub --once /manual_cal intrinsic_cal/rail_ical_location \"rail_location: 0.0\")");
     const std::string message_topic = "/manual_cal";
     intrinsic_cal::rail_ical_location command = *(ros::topic::waitForMessage<intrinsic_cal::rail_ical_location>(message_topic));
-    if(command.rail_location=0.0){
+    if(command.rail_location==0.0){
+      ROS_ERROR_STREAM("entered");
       ReportPose(0.0,TtoC1);
       break;
     }
@@ -188,7 +189,7 @@ void RobocylCalService::manualCal()
     ROS_WARN_STREAM("SET RAIL TO 0.8 then enter the command: \nrostopic pub --once /manual_cal intrinsic_cal/rail_ical_location \"rail_location: 0.0\")");
     const std::string message_topic = "/manual_cal";
     intrinsic_cal::rail_ical_location command = *(ros::topic::waitForMessage<intrinsic_cal::rail_ical_location>(message_topic));
-    if(command.rail_location=0.8){
+    if(command.rail_location==0.8){
       ReportPose(0.0,TtoC2);
       break;
     }
@@ -229,7 +230,7 @@ void RobocylCalService::manualCal()
       ROS_WARN_STREAM("SET RAIL TO" << Dist << "then enter the command: \nrostopic pub --once /manual_cal intrinsic_cal/rail_ical_location \"rail_location: " << Dist << " \")");
       const std::string message_topic = "/manual_cal";
       intrinsic_cal::rail_ical_location command = *(ros::topic::waitForMessage<intrinsic_cal::rail_ical_location>(message_topic));
-      if(command.rail_location = Dist){
+      if(command.rail_location == Dist){
         ReportPose(0.0,TtoC2);
         break;
       }
