@@ -17,13 +17,16 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Ceres REQUIRED)
 message("-- Found Ceres version ${CERES_VERSION}: ${CERES_INCLUDE_DIRS}")
 
-#set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fPIC")
-
-
 add_service_files(
   FILES
     rail_ical_run.srv
 )
+
+add_message_files(
+  FILES
+    rail_ical_location.msg
+)
+
 
 generate_messages(
   DEPENDENCIES
@@ -48,6 +51,7 @@ catkin_package(
 
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${CERES_INCLUDE_DIRS}
 )
