@@ -116,14 +116,14 @@ CircleDetector::Params::Params()
 	minDistBetweenCircles = 10;
         minRadiusDiff = 10;
 
-	filterByColor = true;
+    filterByColor = false;
 	circleColor = 0;
 
 	filterByArea = true;
 	minArea = 25;
 	maxArea = 5000;
 
-	filterByCircularity = false;
+    filterByCircularity = true;
 	minCircularity = 0.8f;
 	maxCircularity = std::numeric_limits<float>::max();
 

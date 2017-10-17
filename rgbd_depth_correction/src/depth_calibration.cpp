@@ -31,6 +31,7 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <industrial_extrinsic_cal/find_target.h>
+#include <target_finder/target_locater.h>
 
 
 
@@ -91,7 +92,8 @@ DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
   calibrate_depth_ = nh_.advertiseService("depth_calibration", &DepthCalibrator::calibrateCameraDepth, this);
   calibrate_pixel_depth_ = nh_.advertiseService("pixel_depth_calibration", &DepthCalibrator::calibrateCameraPixelDepth, this);
   set_store_cloud_ = nh_.advertiseService("store_cloud", &DepthCalibrator::setStoreCloud, this);
-  get_target_pose_ = nh.serviceClient<industrial_extrinsic_cal::find_target>("RangeExCalService");
+  get_target_pose_ = nh.serviceClient<industrial_extrinsic_cal::find_target>("target_pose");
+  //get_target_pose_ = nh.serviceClient<target_finder::target_locater>("target_pose");
 
   this->point_cloud_sub_ = boost::shared_ptr<PointCloudSubscriberType>(new PointCloudSubscriberType(nh, "depth_points", 1));
   this->image_sub_ = boost::shared_ptr<ImageSubscriberType>(new ImageSubscriberType(nh, "image", 1));
@@ -147,7 +149,7 @@ bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, st
   {
     for(int j = 0; j < saved_clouds_.size(); ++j)
     {
-      if(std::isnan(saved_clouds_[j].points.at(i).x) || saved_clouds_[j].points.at(i).z == 0)
+      if(std::isnan(saved_clouds_[j].points.at(i).x) || std::isinf(saved_clouds_[j].points.at(i).x) || saved_clouds_[j].points.at(i).z == 0 || std::isnan(correction_cloud_.points.at(i).z) || std::isinf(correction_cloud_.points.at(i).z))
       {
         continue;
       }
@@ -540,16 +542,27 @@ bool DepthCalibrator::findTarget(const double &final_cost, geometry_msgs::Pose& 
   //Get target pose
   industrial_extrinsic_cal::find_target::Request target_request;
   industrial_extrinsic_cal::find_target::Response target_response;
+
+//  target_finder::target_locaterRequest target_request;
+//  target_finder::target_locaterResponse target_response;
+
   target_request.allowable_cost_per_observation = 5000.0;
+
+//  target_request.roi.x_offset = 0;
+//  target_request.roi.y_offset = 0;
+//  target_request.roi.height = 480;
+//  target_request.roi.width = 640;
+//  target_request.roi.do_rectify = false;
+//  target_request.initial_pose = target_initial_pose_;
 
   if(!get_target_pose_.call(target_request, target_response))
   {
     ROS_ERROR("Failed to get target pose.");
     rtn = false;
   }
-  else if(target_response.cost_per_observation > final_cost)
+  else if(target_response.final_cost_per_observation > final_cost)
   {
-    ROS_ERROR("Target pose error too large (%.3f).", target_response.cost_per_observation);
+    ROS_ERROR("Target pose error too large (%.3f).", target_response.final_cost_per_observation);
     rtn = false;
   }
 

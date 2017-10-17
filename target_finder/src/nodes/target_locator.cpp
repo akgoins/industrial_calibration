@@ -61,6 +61,7 @@ private:
   int target_type_;
   int target_rows_;
   int target_cols_;
+  boost::shared_ptr<ROSCameraObserver> camera_observer_;
 
 };
 
@@ -113,6 +114,11 @@ TargetLocatorService::TargetLocatorService(ros::NodeHandle nh)
   if(!pnh.getParam("service_name", service_name)){
     service_name = "TargetLocateService";
   }
+
+  camera_observer_ = boost::shared_ptr<ROSCameraObserver>(new ROSCameraObserver(image_topic_, camera_name_));
+
+  //camera_observer_ = camera_observer;
+
   target_locate_server_ = nh_.advertiseService( service_name.c_str(), &TargetLocatorService::executeCallBack, this);
 }
 
@@ -121,17 +127,17 @@ bool TargetLocatorService::executeCallBack( target_locater::Request &req, target
   ros::NodeHandle nh;
   CameraObservations camera_observations;
 
-  ROSCameraObserver camera_observer(image_topic_, camera_name_);
+  //ROSCameraObserver camera_observer(image_topic_, camera_name_);
 
   // get the focal length and optical center
   double fx,fy,cx,cy; 
   double k1,k2,k3,p1,p2;// unused 
   int height, width; //unused
-  if(!camera_observer.pullCameraInfo(fx, fy, cx, cy, k1, k2, k3, p1, p2, width, height)){
+  if(!camera_observer_->pullCameraInfo(fx, fy, cx, cy, k1, k2, k3, p1, p2, width, height)){
     ROS_ERROR("could not access camera info");
   }
-  camera_observer.clearObservations();
-  camera_observer.clearTargets();
+  camera_observer_->clearObservations();
+  camera_observer_->clearTargets();
 
   // set the roi to the requested
   Roi roi;
@@ -142,13 +148,10 @@ bool TargetLocatorService::executeCallBack( target_locater::Request &req, target
 
   industrial_extrinsic_cal::Cost_function cost_type;
   
-  camera_observer.clearTargets();
-  camera_observer.clearObservations();
-
-  camera_observer.addTarget(target_, roi, cost_type);
-  camera_observer.triggerCamera();
-  while (!camera_observer.observationsDone()) ;
-  camera_observer.getObservations(camera_observations);
+  camera_observer_->addTarget(target_, roi, cost_type);
+  camera_observer_->triggerCamera();
+  while (!camera_observer_->observationsDone()) ;
+  camera_observer_->getObservations(camera_observations);
   int num_observations = (int) camera_observations.size();
   if(num_observations != target_rows_* target_cols_){
     ROS_ERROR("Target Locator could not find target %d", num_observations);
