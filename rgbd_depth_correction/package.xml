@@ -34,6 +34,7 @@
   <depend>tf</depend>
   <depend>tf_conversions</depend>
   <depend>target_finder</depend>
+  <depend>robo_cylinder</depend>
   <depend>yaml-cpp</depend>
   <depend>ceres-solver</depend>
 
