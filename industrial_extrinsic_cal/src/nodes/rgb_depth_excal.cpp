@@ -150,17 +150,15 @@ action_server_(nh_,"run_calibration",boost::bind(&RangeExCalService::actionCallb
   }
   initMCircleTarget(target_rows_, target_cols_, diameter, spacing);
   
-  std::string service_name;
-  if(!pnh.getParam("service_name", service_name)){
-    service_name = "RangeExCalService";
-  }
   industrial_extrinsic_cal::CameraParameters temp_parameters;
   temp_parameters.height = image_height_;
   temp_parameters.width = image_width_;
   camera_ = boost::make_shared<industrial_extrinsic_cal::Camera>(camera_name_, temp_parameters, false);
   // use the same service type as ususal for calibration, no need to create a new one
-  range_excal_server_ =nh.advertiseService(service_name.c_str(), &RangeExCalService::executeCallBack, this);
+  range_excal_server_ = pnh.advertiseService("calibrate_camera", &RangeExCalService::executeCallBack, this);
   action_server_.start();
+
+  camera_->camera_observer_ = boost::make_shared<ROSCameraObserver>(image_topic_, camera_name_);
 }
 
 bool RangeExCalService::actionCallback(const industrial_extrinsic_cal::calibrationGoalConstPtr& goal)
@@ -192,7 +190,6 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::
   camera_->setTransformInterface(temp_ti);
   camera_->pullTransform();
 
-  camera_->camera_observer_ = boost::make_shared<ROSCameraObserver>(image_topic_, camera_name_);
   camera_->camera_observer_->clearObservations();
   camera_->camera_observer_->clearTargets();
 
@@ -204,6 +201,12 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::
   // get the range data from the 3D camera
   boost::shared_ptr<sensor_msgs::PointCloud2 const> msg;
   msg  = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(cloud_topic_, ros::Duration(10));
+  if(!msg)
+  {
+    ROS_ERROR_STREAM("did not receive point cloud on topic '" << cloud_topic_ << "'");
+    return false;
+  }
+
   ROS_INFO("Received point cloud of size %d X %d", msg->width, msg->height);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud( new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::fromROSMsg(*msg, *cloud);
@@ -365,6 +368,8 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::
 
     if(error_per_observation <= req.allowable_cost_per_observation){
       camera_->pushTransform();
+      std::string none = "";
+      temp_ti->store(none);
       return true;
     }
     else{

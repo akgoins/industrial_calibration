@@ -52,6 +52,10 @@ ROSCameraObserver::ROSCameraObserver(const std::string &camera_topic, const std:
   }
 
   circle_detector_ptr_ = cv::CircleDetector::create();
+  if(!circle_detector_ptr_)
+  {
+    ROS_ERROR("error making CV ptr.");
+  }
   blob_detector_ptr_ = cv::SimpleBlobDetector::create(simple_blob_params);
 
 
@@ -256,11 +260,11 @@ int ROSCameraObserver::getObservations(CameraObservations &cam_obs)
         if(use_circle_detector_){
           ROS_DEBUG("using circle_detector, to find %dx%d modified circle grid", pattern_rows_, pattern_cols_);
           successful_find = cv::findCirclesGrid(image_roi_, pattern_size, centers,
-						cv::CALIB_CB_SYMMETRIC_GRID, circle_detector_ptr_);
+            cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING, circle_detector_ptr_);
           if(!successful_find)
           {
             successful_find = cv::findCirclesGrid(image_roi_, pattern_size_flipped, centers,
-              cv::CALIB_CB_SYMMETRIC_GRID, circle_detector_ptr_);
+              cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING, circle_detector_ptr_);
             flipped_successful_find = successful_find;
           }
         }
@@ -268,13 +272,13 @@ int ROSCameraObserver::getObservations(CameraObservations &cam_obs)
           ROS_DEBUG("using simple_blob_detector, to find %dx%d modified grid", pattern_rows_, pattern_cols_);
           successful_find = cv::findCirclesGrid(
                   image_roi_, pattern_size, centers,
-                  cv::CALIB_CB_SYMMETRIC_GRID,
+                  cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING,
                   blob_detector_ptr_);
           if(!successful_find)
           {
             successful_find = cv::findCirclesGrid(
                     image_roi_, pattern_size_flipped, centers,
-                    cv::CALIB_CB_SYMMETRIC_GRID,
+                    cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING,
                     blob_detector_ptr_);
             flipped_successful_find = successful_find;
           }
@@ -807,7 +811,28 @@ bool  ROSCameraObserver::pullCameraInfo(double &fx, double &fy,
     ROS_ERROR("camera name is not set, cannot pull camera info from topic");
     rtn = false;
   }
-  std::string camera_info_topic = "/" + camera_name_ + "/camera_info";
+
+  std::vector<std::string> strings;
+  std::stringstream topic_stream(image_topic_);
+  std::string topic;
+
+  int pos = image_topic_.find_last_of('/');
+  topic = image_topic_.substr(0, pos);
+
+//  while (getline(topic_stream, topic, '/'))
+//  {
+//    strings.push_back(topic);
+//  }
+//  strings.pop_back();
+//  topic = "";
+//  for(int i = 0; i < strings.size(); ++i)
+//  {
+//    topic.append("/" + strings[i]);
+//  }
+
+  std::string camera_info_topic = topic + "/camera_info";
+  ROS_INFO_STREAM("Pulling camera info from topic " << camera_info_topic);
+
   const sensor_msgs::CameraInfoConstPtr& info_msg =
     ros::topic::waitForMessage<sensor_msgs::CameraInfo>(camera_info_topic, ros::Duration(3.0));
 
@@ -860,7 +885,7 @@ void  ROSCameraObserver::dynReConfCallBack(industrial_extrinsic_cal::circle_grid
     circle_params.minDistBetweenCircles = config.min_distance;
     circle_params.minRadiusDiff = 10;
 
-    circle_params.filterByColor = true;
+    circle_params.filterByColor = false;
     if(white_blobs_)circle_params.circleColor = 200;
     if(!white_blobs_)circle_params.circleColor = 0;
   
@@ -905,7 +930,7 @@ void  ROSCameraObserver::dynReConfCallBack(industrial_extrinsic_cal::circle_grid
     blob_params.minInertiaRatio = 0.1f;
     blob_params.maxInertiaRatio = std::numeric_limits<float>::max();
   
-    blob_params.filterByConvexity = false;
+    blob_params.filterByConvexity = true;
     blob_params.minConvexity = 0.95f;
     blob_params.maxConvexity = std::numeric_limits<float>::max();
 
