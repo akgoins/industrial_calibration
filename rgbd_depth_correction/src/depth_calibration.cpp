@@ -17,7 +17,7 @@
  */
 
 #include <depth_calibration/depth_calibration.h>
-#include <target_finder/target_locater.h>
+#include <industrial_extrinsic_cal/find_target.h>
 #include <boost/thread/locks.hpp>
 #include <sstream>
 
