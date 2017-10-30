@@ -23,6 +23,7 @@
           <param name="image_width" value="640" />
           <param name="target_to_rail_distance" value="2.0" />
           <param name="use_circle_detector" value="true"/>
+          <param name="allowable_cost_per_observation" value="1.0"/>
           <param name="move_client" value="/move_meters"/>
           <param name="power_client" value="/power_io"/>
           <param name="home_client" value="/home"/>

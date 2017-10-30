@@ -1,5 +1,7 @@
 <launch>
 
+  <arg name="auto" default="true"/>
+
   <include file="$(find openni2_launch)/launch/openni2.launch" >
     <arg name="publish_tf" value="true" />
     <arg name="camera" value="camera" />
@@ -19,11 +21,16 @@
           <param name="camera_spacing" value="0.10" />
           <param name="image_height" value="480" />
           <param name="image_width" value="640" />
-          <param name="target_to_rail_distance" value="2.0" />
+          <param name="target_to_rail_distance" value="1.0" />
           <param name="use_circle_detector" value="true"/>
           <param name="move_client" value="/move_meters"/>
           <param name="power_client" value="/power_io"/>
           <param name="home_client" value="/home"/>
+          <param name="min_threshold" value="100"/>
+
+          <param name="allowable_cost_per_observation" value="1.0"/>
+          <param name="auto" value="$(arg auto)"/>
+
           <remap from="color_image" to="camera/rgb/image_raw" />
   </node>
   <!--

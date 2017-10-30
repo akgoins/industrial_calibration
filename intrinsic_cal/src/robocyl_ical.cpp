@@ -1,102 +1,4 @@
-/*
- * Software License Agreement (Apache License)
- *
- * Copyright (c) 2014, Southwest Research Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#include <ros/ros.h>
-#include <ros/package.h>
-#include <ros/console.h>
-#include <sensor_msgs/Image.h>
-#include <cv_bridge/cv_bridge.h>
-#include <opencv2/opencv.hpp>
-#include <industrial_extrinsic_cal/camera_observer_trigger.h>
-#include <industrial_extrinsic_cal/user_accept.h>
-#include <industrial_extrinsic_cal/ros_camera_observer.h>
-#include <industrial_extrinsic_cal/basic_types.h>
-#include <industrial_extrinsic_cal/camera_definition.h>
-#include <industrial_extrinsic_cal/ceres_costs_utils.h>
-#include <industrial_extrinsic_cal/ceres_costs_utils.hpp>
-#include <intrinsic_cal/rail_ical_run.h>
-#include <intrinsic_cal/rail_ical_run.h>
-#include <intrinsic_cal/rail_ical_run.h>
-#include <robo_cylinder/HomeCmd.h>
-#include <robo_cylinder/MoveMeters.h>
-#include <robo_cylinder/MovePulses.h>
-#include <robo_cylinder/PowerIO.h>
-#include <robo_cylinder/StatusUpdate.h>
-#include <robo_cylinder/VelAcc.h>
-#include "ceres/ceres.h"
-#include "ceres/rotation.h"
-#include "ceres/types.h"
-
-using std::string;
-using boost::shared_ptr;
-using ceres::CostFunction;
-using ceres::Problem;
-using ceres::Solver;
-using industrial_extrinsic_cal::Target;
-using industrial_extrinsic_cal::CameraObservations;
-using industrial_extrinsic_cal::ROSCameraObserver;
-using industrial_extrinsic_cal::Roi;
-using industrial_extrinsic_cal::Pose6d;
-using industrial_extrinsic_cal::Point3d;
-using industrial_extrinsic_cal::Camera;
-using industrial_extrinsic_cal::CameraParameters;
-using industrial_extrinsic_cal::NoWaitTrigger;
-
-class RobocylCalService
-{
-public:
-  RobocylCalService(ros::NodeHandle nh);
-  ~RobocylCalService()  {  } ;
-  bool executeCallBack( intrinsic_cal::rail_ical_run::Request &req, intrinsic_cal::rail_ical_run::Response &res);
-  bool MoveAndReportPose(double rail_position, Pose6d &P);
-  void  initMCircleTarget(int rows, int cols, double circle_dia, double spacing);
-  void cameraCallback(const sensor_msgs::Image& image);
-
-private:
-  ros::NodeHandle nh_;
-  ros::ServiceServer rail_cal_server_;
-  ros::Subscriber rgb_sub_;
-  ros::Publisher rgb_pub_;
-  ros::ServiceClient move_client_; /**< a client for calling the service to move the robo-cylinder to a new location */
-  ros::ServiceClient power_client_; /**< a client for calling the service to turn on the robo-cylinder */
-  ros::ServiceClient home_client_; /**< a client for calling the service to move robo-cylinder to its home position */
-  shared_ptr<Target> target_;
-  shared_ptr<Camera> camera_;
-  double focal_length_x_;
-  double focal_length_y_;
-  double center_x_;
-  double center_y_;
-  string image_topic_;
-  string camera_name_;
-  int target_type_;
-  int target_rows_;
-  int target_cols_;
-  double circle_spacing_;
-  double circle_diameter_;
-  int num_camera_locations_;
-  double camera_spacing_;
-  int image_height_;
-  int image_width_;
-  double D0_;
-  double qx_, qy_, qz_, qw_;
-  CameraParameters camera_parameters_;
-  double allowable_cost_per_observation_;
-};
+#include "intrinsic_cal/robocyl_ical.h"
 
 RobocylCalService::RobocylCalService(ros::NodeHandle nh)
 {
@@ -141,6 +43,14 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
   }
   if(!pnh.getParam( "target_to_rail_distance", D0_)){
     ROS_ERROR("Must set param:  target_to_rail_distance");
+  }
+
+  if(!pnh.getParam( "allowable_cost_per_observation", allowable_cost_per_observation_)){
+    ROS_ERROR("Must set param:  allowable_cost_per_observation");
+  }
+
+  if(!pnh.getParam( "auto", auto_)){
+    ROS_ERROR("Must set param:  auto");
   }
 
   bool use_quaternion = false;
@@ -196,7 +106,8 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
   camera_ =  shared_ptr<industrial_extrinsic_cal::Camera>(new industrial_extrinsic_cal::Camera("my_camera", camera_parameters_, is_moving));
   camera_->trigger_ = shared_ptr<NoWaitTrigger>(new NoWaitTrigger());
   camera_->camera_observer_ = shared_ptr<ROSCameraObserver>(new ROSCameraObserver(image_topic_, camera_name_));
-  sleep(15); // wait for camera to come up or else this will fail
+
+  ros::service::waitForService("/"+camera_name_+"/rgb/set_camera_info",ros::Duration(15)); //should be wait for message to match pull camera info method
   if(!camera_->camera_observer_->pullCameraInfo(camera_->camera_parameters_.focal_length_x,
                                            camera_->camera_parameters_.focal_length_y,
                                            camera_->camera_parameters_.center_x,
@@ -225,9 +136,14 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
 
   initMCircleTarget(target_rows_, target_cols_, circle_diameter_, circle_spacing_);
 
-  rail_cal_server_ = nh_.advertiseService( "RobocylCalService", &RobocylCalService::executeCallBack, this);
+  if(auto_) autoCal();
+    else
+
+  manualCal();
 
 }
+
+RobocylCalService::~RobocylCalService(){}
 
 void RobocylCalService::cameraCallback(const sensor_msgs::Image &image)
 {
@@ -243,19 +159,123 @@ void RobocylCalService::cameraCallback(const sensor_msgs::Image &image)
 
 }
 
-bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &req, intrinsic_cal::rail_ical_run::Response &res)
+void RobocylCalService::manualCal()
 {
-  allowable_cost_per_observation_ = req.allowable_cost_per_observation;
-  ros::NodeHandle nh;
+  CameraObservations camera_observations;
+  int num_observations;
+  int total_observations=0;
+  camera_->camera_observer_->clearObservations();
+  camera_->camera_observer_->clearTargets();
+  Pose6d TtoC1, TtoC2; // transforms points in target frame into either Camera1 or Camera2 frames
+  Pose6d C1toT, C2toT; // transforms points in camera1,2 frames into Target Frame
+  Pose6d C2toC1; // transform points in camera2 frame into camera1 frame
+
+
+  //move rail to back
+  while(true){
+    ROS_WARN_STREAM("SET RAIL TO 0 then enter the command: \nrostopic pub --once /manual_cal intrinsic_cal/rail_ical_location \"rail_location: 0.0\")");
+    const std::string message_topic = "/manual_cal";
+    intrinsic_cal::rail_ical_location command = *(ros::topic::waitForMessage<intrinsic_cal::rail_ical_location>(message_topic));
+    if(command.rail_location==0.0){
+      ROS_ERROR_STREAM("entered");
+      ReportPose(0.0,TtoC1);
+      break;
+    }
+    else ROS_WARN_STREAM("Move rail to 0.0 meters");
+  }
+
+  //move rail to front
+  while(true){
+    ROS_WARN_STREAM("SET RAIL TO 0.8 then enter the command: \nrostopic pub --once /manual_cal intrinsic_cal/rail_ical_location \"rail_location: 0.0\")");
+    const std::string message_topic = "/manual_cal";
+    intrinsic_cal::rail_ical_location command = *(ros::topic::waitForMessage<intrinsic_cal::rail_ical_location>(message_topic));
+    if(command.rail_location==0.8){
+      ReportPose(0.0,TtoC2);
+      break;
+    }
+    else ROS_WARN_STREAM("Move rail to 0.8 meters");
+  }
+
+  allowable_cost_per_observation_  =allowable_cost_per_observation_/3;
+
+  C2toT = TtoC2.getInverse(); // this transform points in C2 frame into Target frame
+  C2toC1 = TtoC1*C2toT; // this transforms points in C2 frame into Target then into C1 frame as one multiply
+  tf::Vector3 mv = C2toC1.getOrigin(); // the origin is the vector in C1 coordinates
+  mv.normalize();
+
+  ROS_INFO("mv: %lf %lf %lf",mv.getX(),mv.getY(),mv.getZ());
+  // set the roi to the whole image
+  Roi roi;
+  roi.x_min = 0;
+  roi.y_min = 0;
+  roi.x_max = image_width_;
+  roi.y_max = image_height_;
+
+  industrial_extrinsic_cal::Cost_function cost_type = industrial_extrinsic_cal::cost_functions::CameraReprjErrorWithDistortion;
+  Problem problem;
+
+  // set initial conditions,
+  target_->pose_.setQuaternion(qx_, qy_, qz_, qw_);
+  target_->pose_.setOrigin(0.011, 0.05, D0_);
+  target_->pose_.show("initial target pose");
+
+  for(int i=0; i<num_camera_locations_; i++){
+    double Dist = i*camera_spacing_;
+    Point3d rail_position;
+    rail_position.x = -Dist*mv.getX();
+    rail_position.y = -Dist*mv.getY();
+    rail_position.z = -Dist*mv.getZ();
+
+    while(true){
+      ROS_WARN_STREAM("SET RAIL TO" << Dist << "then enter the command: \nrostopic pub --once /manual_cal intrinsic_cal/rail_ical_location \"rail_location: " << Dist << " \")");
+      const std::string message_topic = "/manual_cal";
+      intrinsic_cal::rail_ical_location command = *(ros::topic::waitForMessage<intrinsic_cal::rail_ical_location>(message_topic));
+      if(command.rail_location == Dist){
+        ReportPose(0.0,TtoC2);
+        break;
+      }
+      else ROS_WARN_STREAM("Move rail to " << Dist <<" meters");
+    }
+
+    // gather next image
+    camera_->camera_observer_->clearTargets();
+    camera_->camera_observer_->clearObservations();
+    camera_->camera_observer_->addTarget(target_, roi, cost_type);
+    camera_->camera_observer_->triggerCamera();
+    while (!camera_->camera_observer_->observationsDone()) ;
+    if(camera_->camera_observer_->getObservations(camera_observations)){
+      ROS_INFO("Found %d observations",(int) camera_observations.size());
+      num_observations = (int) camera_observations.size();
+      if(num_observations != target_rows_* target_cols_){
+  ROS_ERROR("Target Locator could not find target %d", num_observations);
+      }
+      else{
+  // add a new cost to the problem for each observation
+  CostFunction* cost_function[num_observations];
+  total_observations += num_observations;
+  for(int i=0; i<num_observations; i++){
+    double image_x = camera_observations[i].image_loc_x;
+    double image_y = camera_observations[i].image_loc_y;
+    Point3d point = target_->pts_[camera_observations[i].point_id]; // don't assume ordering from camera observer
+    cost_function[i] = industrial_extrinsic_cal::RailICal3::Create(image_x, image_y, rail_position, point);
+    problem.AddResidualBlock(cost_function[i], NULL ,
+           camera_->camera_parameters_.pb_intrinsics,
+           target_->pose_.pb_pose);
+  } // for each observation at this camera_location
+      } // end target size matches observation number
+    }// end if get observations successful
+  }// end for each camera location
+
+  ROS_WARN_STREAM("DONE");
+}
+
+void RobocylCalService::autoCal()
+{
   CameraObservations camera_observations;
   robo_cylinder::MoveMeters::Request mm_request; /**< request when transform is part of a mutable set */
   robo_cylinder::MoveMeters::Response mm_response; /**< request when transform is part of a mutable set */
-  robo_cylinder::PowerIO::Request pio_request; /**< request when transform is part of a mutable set */
-  robo_cylinder::PowerIO::Response pio_response; /**< request when transform is part of a mutable set */
-  robo_cylinder::HomeCmd::Request hc_request; /**< request when transform is part of a mutable set */
-  robo_cylinder::HomeCmd::Response hc_response; /**< request when transform is part of a mutable set */
 
-  int num_observations ;
+  int num_observations;
   int total_observations=0;
   double rxry[2]; // pitch and yaw of camera relative to rail
   rxry[0] = 0.0;
@@ -264,23 +284,16 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
   camera_->camera_observer_->clearObservations();
   camera_->camera_observer_->clearTargets();
 
-  // turn power on to robo-cylinder, and move it home
-  pio_request.io = 1;
-  power_client_.call(pio_request, pio_response);
-  home_client_.call(hc_request, hc_response);
-
   Pose6d TtoC1, TtoC2; // transforms points in target frame into either Camera1 or Camera2 frames
-  Pose6d C1toT, C2toT; // transforms points in camera1,2 frames into Target Frame
+  Pose6d C2toT; // transforms points in camera1,2 frames into Target Frame
   Pose6d C2toC1; // transform points in camera2 frame into camera1 frame
-  allowable_cost_per_observation_  =3*allowable_cost_per_observation_;
+  allowable_cost_per_observation_  = 3*allowable_cost_per_observation_;
 
-  if(!MoveAndReportPose(0.0,TtoC1)){
-    if(!MoveAndReportPose(0.0,TtoC1)) return(false);
-  }
-  if(!MoveAndReportPose((num_camera_locations_-1)*camera_spacing_,TtoC2)){
-    if(!MoveAndReportPose((num_camera_locations_-1)*camera_spacing_,TtoC2)) return(false);
-  }
+  MoveAndReportPose(0.0,TtoC1);
+  MoveAndReportPose((num_camera_locations_-1)*camera_spacing_,TtoC2);
+
   allowable_cost_per_observation_  =allowable_cost_per_observation_/3;
+
   C2toT = TtoC2.getInverse(); // this transform points in C2 frame into Target frame
   C2toC1 = TtoC1*C2toT; // this transforms points in C2 frame into Target then into C1 frame as one multiply
   tf::Vector3 mv = C2toC1.getOrigin(); // the origin is the vector in C1 coordinates
@@ -311,9 +324,11 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
     rail_position.y = -Dist*mv.getY();
     rail_position.z = -Dist*mv.getZ();
 
-    ROS_INFO("moving to %lf",Dist);
     mm_request.meters = Dist;
-    move_client_.call(mm_request, mm_response); // this call blocks until camera is moved
+    while(true){
+      ROS_INFO("Attempting to moving to %lf",Dist);
+      if(move_client_.call(mm_request, mm_response)) break; // this call blocks until camera is moved
+    }
 
     // gather next image
     camera_->camera_observer_->clearTargets();
@@ -372,15 +387,8 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
        camera_->camera_parameters_.center_x,
        camera_->camera_parameters_.focal_length_y,
        camera_->camera_parameters_.center_y);
-    if(final_cost <= req.allowable_cost_per_observation){
-      res.final_pose.position.x = target_->pose_.x;
-      res.final_pose.position.y = target_->pose_.y;
-      res.final_pose.position.z = target_->pose_.z;
-      res.final_cost_per_observation  = final_cost;
-      target_->pose_.getQuaternion(res.final_pose.orientation.x,
-           res.final_pose.orientation.y,
-           res.final_pose.orientation.z,
-           res.final_pose.orientation.w);
+    if(final_cost <= allowable_cost_per_observation_){
+      ROS_INFO_STREAM("CALIBRATION SUCCEEDED");
       camera_->camera_observer_->pushCameraInfo(camera_->camera_parameters_.focal_length_x,
                                                 camera_->camera_parameters_.focal_length_y,
                                                 camera_->camera_parameters_.center_x,
@@ -390,23 +398,33 @@ bool RobocylCalService::executeCallBack( intrinsic_cal::rail_ical_run::Request &
                                                 camera_->camera_parameters_.distortion_k3,
                                                 camera_->camera_parameters_.distortion_p1,
                                                 camera_->camera_parameters_.distortion_p2);
-
-      return true;
     }
     else{
-      res.final_cost_per_observation  = final_cost;
-      ROS_ERROR("allowable cost exceeded %f > %f", final_cost, req.allowable_cost_per_observation);
-      return(false);
+      ROS_INFO_STREAM("CALIBRATION FAILED");
     }
+
   }
 }
 
+
 bool RobocylCalService::MoveAndReportPose(double rail_position, Pose6d &P)
 {
-  ros::NodeHandle nh;
-  CameraObservations camera_observations;
   robo_cylinder::MoveMeters::Request mm_request; /**< request when transform is part of a mutable set */
   robo_cylinder::MoveMeters::Response mm_response; /**< request when transform is part of a mutable set */
+
+  // Move camera into position
+  ROS_INFO("moving to %lf",rail_position);
+  mm_request.meters = rail_position;
+  while(true){
+    ROS_INFO("Attempting to moving to %lf",rail_position);
+    if(move_client_.call(mm_request, mm_response)) break; // this call blocks until camera is moved
+  }
+  return ReportPose(rail_position, P);
+}
+
+bool RobocylCalService::ReportPose(double rail_position, Pose6d &P)
+{
+  CameraObservations camera_observations;
   int num_observations;
   int total_observations=0;
   double fx,fy,cx,cy;
@@ -436,12 +454,6 @@ bool RobocylCalService::MoveAndReportPose(double rail_position, Pose6d &P)
   pose.setQuaternion(qx_, qy_, qz_, qw_);
   pose.setOrigin(0.011, 0.05, D0_-rail_position);
   pose.show("initial pose");
-
-  // Move camera into position
-  ROS_INFO("moving to %lf",rail_position);
-  mm_request.meters = rail_position;
-  move_client_.call(mm_request, mm_response);
-
 
   camera_->camera_observer_->clearObservations();
   camera_->camera_observer_->clearTargets();

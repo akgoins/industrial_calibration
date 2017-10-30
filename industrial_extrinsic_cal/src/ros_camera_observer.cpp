@@ -52,10 +52,6 @@ ROSCameraObserver::ROSCameraObserver(const std::string &camera_topic, const std:
   }
 
   circle_detector_ptr_ = cv::CircleDetector::create();
-  if(!circle_detector_ptr_)
-  {
-    ROS_ERROR("error making CV ptr.");
-  }
   blob_detector_ptr_ = cv::SimpleBlobDetector::create(simple_blob_params);
 
 
@@ -812,23 +808,8 @@ bool  ROSCameraObserver::pullCameraInfo(double &fx, double &fy,
     rtn = false;
   }
 
-  std::vector<std::string> strings;
-  std::stringstream topic_stream(image_topic_);
-  std::string topic;
-
   int pos = image_topic_.find_last_of('/');
-  topic = image_topic_.substr(0, pos);
-
-//  while (getline(topic_stream, topic, '/'))
-//  {
-//    strings.push_back(topic);
-//  }
-//  strings.pop_back();
-//  topic = "";
-//  for(int i = 0; i < strings.size(); ++i)
-//  {
-//    topic.append("/" + strings[i]);
-//  }
+  std::string topic = image_topic_.substr(0, pos);
 
   std::string camera_info_topic = topic + "/camera_info";
   ROS_INFO_STREAM("Pulling camera info from topic " << camera_info_topic);
@@ -914,7 +895,7 @@ void  ROSCameraObserver::dynReConfCallBack(industrial_extrinsic_cal::circle_grid
     blob_params.minRepeatability = 2;
     blob_params.minDistBetweenBlobs = config.min_distance;
 
-    blob_params.filterByColor = true;
+    blob_params.filterByColor = false;
     if(white_blobs_)blob_params.blobColor = 200;
     if(!white_blobs_)blob_params.blobColor = 0;
   
@@ -930,7 +911,7 @@ void  ROSCameraObserver::dynReConfCallBack(industrial_extrinsic_cal::circle_grid
     blob_params.minInertiaRatio = 0.1f;
     blob_params.maxInertiaRatio = std::numeric_limits<float>::max();
   
-    blob_params.filterByConvexity = true;
+    blob_params.filterByConvexity = false;
     blob_params.minConvexity = 0.95f;
     blob_params.maxConvexity = std::numeric_limits<float>::max();
 

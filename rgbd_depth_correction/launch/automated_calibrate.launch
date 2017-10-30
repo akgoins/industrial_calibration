@@ -1,15 +1,13 @@
 <?xml version="1.0" ?>
 <launch>
   
+  <arg name="file" default="camera" />
   <!--
   The automated calibration routine launch the manual calibration nodes and makes the required
   -->
 
-
-
   <include file="$(find rgbd_depth_correction)/launch/calibrate.launch">
-    <arg name="file" value="1504101060" />
-    <param name="num_views" value="5"/>
+    <arg name="file" value="$(arg file)" />
   </include>
 
   <include file="$(find robo_cylinder)/launch/robo_cylinder.launch" />

@@ -84,13 +84,15 @@ DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
   pnh.param<int>("num_views", num_views_, 30);
   pnh.param<int>("num_attempts", num_attempts_, 100);
   pnh.param<int>("point_cloud_history", num_point_clouds_, 30);
+  pnh.param<int>("stride", stride_, 1);
+  stride_ = stride_ < 1 ? 1 : stride_;  // make sure stride is greater than zero
 
 
   //Create Subscribers and Services
   calibrate_depth_ = nh_.advertiseService("depth_calibration", &DepthCalibrator::calibrateCameraDepth, this);
   calibrate_pixel_depth_ = nh_.advertiseService("pixel_depth_calibration", &DepthCalibrator::calibrateCameraPixelDepth, this);
   set_store_cloud_ = nh_.advertiseService("store_cloud", &DepthCalibrator::setStoreCloud, this);
-  get_target_pose_ = nh.serviceClient<target_finder::target_locater>("TargetLocateService");
+  get_target_pose_ = nh.serviceClient<industrial_extrinsic_cal::find_target>("target_pose");
 
   this->point_cloud_sub_ = boost::shared_ptr<PointCloudSubscriberType>(new PointCloudSubscriberType(nh, "depth_points", 1));
   this->image_sub_ = boost::shared_ptr<ImageSubscriberType>(new ImageSubscriberType(nh, "image", 1));
@@ -146,7 +148,13 @@ bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, st
   {
     for(int j = 0; j < saved_clouds_.size(); ++j)
     {
-      if(std::isnan(saved_clouds_[j].points.at(i).x) || saved_clouds_[j].points.at(i).z == 0)
+      // Check stride value and continue if necessary
+      if(j % stride_ > 0)
+      {
+        continue;
+      }
+      // now check for NaN's and zeros, continue if any found
+      if(std::isnan(saved_clouds_[j].points.at(i).x) || std::isinf(saved_clouds_[j].points.at(i).x) || saved_clouds_[j].points.at(i).z == 0 || std::isnan(correction_cloud_.points.at(i).z) || std::isinf(correction_cloud_.points.at(i).z))
       {
         continue;
       }
@@ -167,7 +175,7 @@ bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, st
   ceres::Solve(options, &problem, &summary);
 
   ROS_INFO("depth calibration resulting parameters: d1: %.3f, d2: %.3f ",dp[0],dp[1]);
-  ROS_INFO("Finished calculating in %.2f seconds with a residual error of: %.3f (and num residuals: %d)",
+  ROS_INFO("Finished calculating in %.2f seconds with a residual error of: %.5f (and num residuals: %d)",
            summary.total_time_in_seconds, summary.final_cost, summary.num_residuals);
 
   //Store distortion coefficients in YAML file
@@ -178,6 +186,8 @@ bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, st
   saved_clouds_.clear();
   plane_equations_.clear();
   saved_images_.clear();
+
+  return true;
 }
 
 bool DepthCalibrator::findAveragePointCloud(pcl::PointCloud<pcl::PointXYZ>& final_cloud)
@@ -537,15 +547,10 @@ bool DepthCalibrator::findTarget(const double &final_cost, geometry_msgs::Pose& 
 {
   bool rtn = true;
   //Get target pose
-  target_finder::target_locaterRequest target_request;
-  target_finder::target_locaterResponse target_response;
+  industrial_extrinsic_cal::find_target::Request target_request;
+  industrial_extrinsic_cal::find_target::Response target_response;
   target_request.allowable_cost_per_observation = 5000.0;
-  target_request.roi.height = 480;
-  target_request.roi.width = 640;
-  target_request.roi.do_rectify = false;
-  target_request.roi.x_offset = 0;
-  target_request.roi.y_offset = 0;
-  target_request.initial_pose = target_initial_pose_;
+
 
   if(!get_target_pose_.call(target_request, target_response))
   {

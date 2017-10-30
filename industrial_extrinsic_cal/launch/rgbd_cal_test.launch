@@ -57,14 +57,14 @@
    <remap from="calibration_service" to="camera1_calibration_service"/>
 
    <param name="use_circle_detector" value="true" />
-   <param name="image_topic" value="/kinect/rgb/image_raw" />
-   <param name="cloud_topic" value="/kinect/depth_registered/points" />
-   <param name="camera_name" value="kinect" />
+   <param name="image_topic" value="/camera/rgb/image_raw" />
+   <param name="cloud_topic" value="/camera/depth_registered/points" />
+   <param name="camera_name" value="camera" />
    <param name="image_height" value="480" />
    <param name="image_width" value="640" />
-   <param name="target_frame" value="kinect_rgb_optical_frame" />
+   <param name="target_frame" value="camera_rgb_optical_frame" />
    <param name="camera_mounting_frame" value="target_frame" />
-   <param name="camera_frame" value="kinect_link" />
+   <param name="camera_frame" value="camera_link" />
    <param name="ROI_xmin" value="0" />
    <param name="ROI_ymin" value="0" />
    <param name="ROI_xmax" value="640" />

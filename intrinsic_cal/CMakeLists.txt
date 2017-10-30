@@ -25,6 +25,12 @@ add_service_files(
     rail_ical_run.srv
 )
 
+add_message_files(
+  FILES
+    rail_ical_location.msg
+)
+
+
 generate_messages(
   DEPENDENCIES
     geometry_msgs
@@ -48,6 +54,7 @@ catkin_package(
 
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${CERES_INCLUDE_DIRS}
 )

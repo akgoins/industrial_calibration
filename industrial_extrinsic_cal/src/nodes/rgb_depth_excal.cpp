@@ -286,20 +286,13 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::
       first_pt.x = pff.x;
       first_pt.y = pff.y;
       first_pt.z = pff.z;
-      ROS_INFO("first point: %4.3f, %4.3f, %4.3f", pt1.x, pt1.y, pt1.z);
-      ROS_INFO("first point: %4.3f, %4.3f, %4.3f", pt2.x, pt2.y, pt2.z);
-      ROS_INFO("first point: %4.3f, %4.3f, %4.3f", pt3.x, pt3.y, pt3.z);
     }
     else if(i == num_observations - 1)
     {
       last_pt.x = pff.x;
       last_pt.y = pff.y;
       last_pt.z = pff.z;
-      ROS_INFO("last point: %4.3f, %4.3f, %4.3f", pt1.x, pt1.y, pt1.z);
-      ROS_INFO("last point: %4.3f, %4.3f, %4.3f", pt2.x, pt2.y, pt2.z);
-      ROS_INFO("last point: %4.3f, %4.3f, %4.3f", pt3.x, pt3.y, pt3.z);
     }
-    ROS_INFO("image(%f %f) pff(%f %f %f), tpt(%f %f %f)", image_x, image_y, pff.x, pff.y, pff.z, tpoint.x, tpoint.y, tpoint.z);
     // using the image_location x and y, determine the best estimate of x,y,z
     if(std::isnan(pt3.x))
     {
@@ -334,7 +327,7 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::
      ){
     // Set final cost and error
     double error_per_observation = summary.final_cost/num_observations;
-    res.cost_per_observation  = error_per_observation;
+    res.final_cost_per_observation  = error_per_observation;
     ROS_INFO("cost per observation = %f", error_per_observation);
     res.percent_error = error;
 
@@ -355,16 +348,16 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::
     orientation.setZ(z);
     orientation.setW(w);
     camera_trans.setRotation(orientation);
-    tf::Transform target_trans = camera_trans.inverse();
+    //tf::Transform target_trans = camera_trans.inverse();
 
     // populate return message
-    res.final_pose.position.x = target_trans.getOrigin().getX();
-    res.final_pose.position.y = target_trans.getOrigin().getY();
-    res.final_pose.position.z = target_trans.getOrigin().getZ();
-    res.final_pose.orientation.w = target_trans.getRotation().getW();
-    res.final_pose.orientation.x = target_trans.getRotation().getX();
-    res.final_pose.orientation.y = target_trans.getRotation().getY();
-    res.final_pose.orientation.z = target_trans.getRotation().getZ();
+    res.final_pose.position.x = camera_trans.getOrigin().getX();
+    res.final_pose.position.y = camera_trans.getOrigin().getY();
+    res.final_pose.position.z = camera_trans.getOrigin().getZ();
+    res.final_pose.orientation.w = camera_trans.getRotation().getW();
+    res.final_pose.orientation.x = camera_trans.getRotation().getX();
+    res.final_pose.orientation.y = camera_trans.getRotation().getY();
+    res.final_pose.orientation.z = camera_trans.getRotation().getZ();
 
     if(error_per_observation <= req.allowable_cost_per_observation){
       camera_->pushTransform();
