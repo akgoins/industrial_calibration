@@ -5,11 +5,11 @@
 //TODO make this more generic, possible push to robo cylinder
 std::vector<float> generate_points(float start, float end, int steps){
     std::vector<float> points;
-    float distance = std::abs(end-start);
+    float distance = std::fabs(end-start);
     ROS_INFO_STREAM(distance);
-    for(int i=1; i<=steps; i++){
-        points.push_back(start-distance/float(steps)*float(i));
-        ROS_INFO_STREAM(start-distance/float(steps)*float(i));
+    for(int i=0; i<steps; i++){
+        points.push_back( start - distance/float(steps-1)*float(i) );
+        ROS_INFO_STREAM( i << " " << points.back());
     }
     return points;
 }

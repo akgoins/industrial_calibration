@@ -188,6 +188,7 @@ private:
   ros::ServiceServer calibrate_pixel_depth_; /**< @brief Service to calculate pixel depth error */
   ros::ServiceServer set_store_cloud_; /**< @brief Service to set and store next point cloud available */
 
+  int stride_;  /**< @brief The stride for skipping points in the point cloud when adding to the cost function for calculating the depth coefficients */
   int num_views_;  /**< @brief Number of times to find the calibration target to get average pose */
   int num_attempts_;  /**< @brief Number of attempts allowed for finding calibration target before failing */
   int num_point_clouds_;  /**< @brief Number of point clouds to save and check when performing pixel depth error calculations */

@@ -160,6 +160,7 @@ action_server_(nh_,"run_calibration",boost::bind(&RangeExCalService::actionCallb
   camera_ = boost::make_shared<industrial_extrinsic_cal::Camera>(camera_name_, temp_parameters, false);
   // use the same service type as ususal for calibration, no need to create a new one
   range_excal_server_ =nh.advertiseService(service_name.c_str(), &RangeExCalService::executeCallBack, this);
+  camera_->camera_observer_ = boost::make_shared<ROSCameraObserver>(image_topic_, camera_name_);
   action_server_.start();
 }
 
@@ -192,7 +193,7 @@ bool RangeExCalService::executeCallBack( industrial_extrinsic_cal::find_target::
   camera_->setTransformInterface(temp_ti);
   camera_->pullTransform();
 
-  camera_->camera_observer_ = boost::make_shared<ROSCameraObserver>(image_topic_, camera_name_);
+
   camera_->camera_observer_->clearObservations();
   camera_->camera_observer_->clearTargets();
 

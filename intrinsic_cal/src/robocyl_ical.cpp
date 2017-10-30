@@ -389,6 +389,15 @@ void RobocylCalService::autoCal()
        camera_->camera_parameters_.center_y);
     if(final_cost <= allowable_cost_per_observation_){
       ROS_INFO_STREAM("CALIBRATION SUCCEEDED");
+      camera_->camera_observer_->pushCameraInfo(camera_->camera_parameters_.focal_length_x,
+                                                camera_->camera_parameters_.focal_length_y,
+                                                camera_->camera_parameters_.center_x,
+                                                camera_->camera_parameters_.center_y,
+                                                camera_->camera_parameters_.distortion_k1,
+                                                camera_->camera_parameters_.distortion_k2,
+                                                camera_->camera_parameters_.distortion_k3,
+                                                camera_->camera_parameters_.distortion_p1,
+                                                camera_->camera_parameters_.distortion_p2);
     }
     else{
       ROS_INFO_STREAM("CALIBRATION FAILED");

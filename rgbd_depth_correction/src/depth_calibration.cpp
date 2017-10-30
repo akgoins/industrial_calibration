@@ -20,6 +20,7 @@
 #include <target_finder/target_locater.h>
 #include <boost/thread/locks.hpp>
 #include <sstream>
+#include <string>
 
 #include <tf/tf.h>
 #include <geometry_msgs/Transform.h>
@@ -43,7 +44,12 @@ DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
   ros::NodeHandle pnh("~");
 
   // get parameters for services, topics, and filename
-  if(!pnh.getParam("filename", filename_))
+  int filename_int;
+  if(pnh.getParam("filename", filename_int))
+  {
+    filename_ = std::to_string(filename_int);
+  }
+  else if(!pnh.getParam("filename", filename_))
   {
     ROS_WARN("Depth calibration file name not given for saving calibration results.  Defaulting to 'camera'.");
     filename_ = "camera";
@@ -86,6 +92,8 @@ DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
   pnh.param<int>("num_views", num_views_, 30);
   pnh.param<int>("num_attempts", num_attempts_, 100);
   pnh.param<int>("point_cloud_history", num_point_clouds_, 30);
+  pnh.param<int>("stride", stride_, 1);
+  stride_ = stride_ < 1 ? 1 : stride_;  // make sure stride is greater than zero
 
 
   //Create Subscribers and Services
@@ -149,6 +157,12 @@ bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, st
   {
     for(int j = 0; j < saved_clouds_.size(); ++j)
     {
+      // Check stride value and continue if necessary
+      if(j % stride_ > 0)
+      {
+        continue;
+      }
+      // now check for NaN's and zeros, continue if any found
       if(std::isnan(saved_clouds_[j].points.at(i).x) || std::isinf(saved_clouds_[j].points.at(i).x) || saved_clouds_[j].points.at(i).z == 0 || std::isnan(correction_cloud_.points.at(i).z) || std::isinf(correction_cloud_.points.at(i).z))
       {
         continue;
@@ -170,7 +184,7 @@ bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, st
   ceres::Solve(options, &problem, &summary);
 
   ROS_INFO("depth calibration resulting parameters: d1: %.3f, d2: %.3f ",dp[0],dp[1]);
-  ROS_INFO("Finished calculating in %.2f seconds with a residual error of: %.3f (and num residuals: %d)",
+  ROS_INFO("Finished calculating in %.2f seconds with a residual error of: %.5f (and num residuals: %d)",
            summary.total_time_in_seconds, summary.final_cost, summary.num_residuals);
 
   //Store distortion coefficients in YAML file
@@ -181,6 +195,8 @@ bool DepthCalibrator::calibrateCameraDepth(std_srvs::Empty::Request &request, st
   saved_clouds_.clear();
   plane_equations_.clear();
   saved_images_.clear();
+
+  return true;
 }
 
 bool DepthCalibrator::findAveragePointCloud(pcl::PointCloud<pcl::PointXYZ>& final_cloud)
