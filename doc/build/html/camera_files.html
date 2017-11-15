@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Camera Calibration Files &mdash; industrial_calibration 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="industrial_calibration 0.1 documentation" href="index.html"/>
+        <link rel="up" title="Calibration Files" href="calibration_files.html"/>
+        <link rel="next" title="Calibration Target Files" href="target_files.html"/>
+        <link rel="prev" title="Calibration Files" href="calibration_files.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+  
+  <script src="_static/js/clipboard.min.js"></script>
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="index.html" class="icon icon-home">
+        
+
+          <br/>
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Test Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_examples.html">Calibration Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_libraries.html">Calibration Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_nodes.html">Calibration Nodes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="calibration_files.html">Calibration YAML Files</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Camera Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="target_files.html">Target Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caljob_files.html">Calibration Job Files</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">industrial_calibration</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+
+        <div class="header-override">
+          <a href="http://rosindustrial.org">
+            <img src="_static/logo.jpg"/>
+          </a>
+          <p>
+            <a href="http://rosindustrial.org">ROS-Industrial Website</a>|<a href="http://rosindustrial.org/news">Blog</a>
+          </p>
+        </div>
+
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="_sources/camera_files.rst.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="calibration_files.html">Calibration Files</a> &raquo;</li>
+      
+    <li>Camera Calibration Files</li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             <div class="admonition note">
+               <p class="first admonition-title">The code used in this tutorial is available!</p>
+               <p class="last">Code can be found at <a href = "https://github.com/ros-industrial/industrial_training">industrial_training repository</a> in gh_pages folder. Use  branch.</p>
+             </div>
+
+            
+  <div class="section" id="camera-calibration-files">
+<h1>Camera Calibration Files<a class="headerlink" href="#camera-calibration-files" title="Permalink to this headline">¶</a></h1>
+<p>In order to perform calibration, you need to first define all of the cameras that you will be calibrating.
+This file specifies certain specific camera information such as image height/width, camera frame name, image topic, etc.
+The first item to identify is whether your camera is moving or static in the scene.  A static camera is one which has a fixed
+transform (e.g. a statically mounted camera on the ceiling, or a statically mounted camera on a robot).  A moving camera is one which moves from image to image and does not have a fixed transform (e.g. performing intrinsic calibration of camera where the camera is waved in front of the target or the target is waved in front of the camera).  For most extrinsic calibration setups, the <cite>static_camera</cite> type will be used.  The <cite>moving_camera</cite> type is primarily used for intrinsic calibration in the afore mentioned scenario (although some intrinsic calibration routines do use the <cite>static_camera</cite> type if the camera is mounted on a robot or linear rail).</p>
+<p>Here is an example camera calibration file:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="l l-Scalar l-Scalar-Plain">static_cameras</span><span class="p p-Indicator">:</span>
+ <span class="p p-Indicator">-</span>
+    <span class="l l-Scalar l-Scalar-Plain">camera_name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Basler-21135423</span>
+    <span class="l l-Scalar l-Scalar-Plain">trigger</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">NO_WAIT_TRIGGER</span>
+    <span class="l l-Scalar l-Scalar-Plain">image_topic</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/camera/image_color</span>
+    <span class="l l-Scalar l-Scalar-Plain">camera_optical_frame</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/camera_rgb_optical_frame</span>
+    <span class="l l-Scalar l-Scalar-Plain">camera_intermediate_frame</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/camera_link</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_ax</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_ay</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.1</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_az</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.2</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_x</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.3</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_y</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.4</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_z</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.5</span>
+    <span class="l l-Scalar l-Scalar-Plain">focal_length_x</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">529.4</span>
+    <span class="l l-Scalar l-Scalar-Plain">focal_length_y</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">529.2</span>
+    <span class="l l-Scalar l-Scalar-Plain">center_x</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">563</span>
+    <span class="l l-Scalar l-Scalar-Plain">center_y</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">463</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_k1</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_k2</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.02</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_k3</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.03</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_p1</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_p2</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+ <span class="p p-Indicator">-</span>
+    <span class="l l-Scalar l-Scalar-Plain">camera_name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Basler-21135424</span>
+    <span class="l l-Scalar l-Scalar-Plain">trigger</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">NO_WAIT_TRIGGER</span>
+    <span class="l l-Scalar l-Scalar-Plain">image_topic</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/camera/image_color</span>
+    <span class="l l-Scalar l-Scalar-Plain">camera_optical_frame</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/camera_rgb_optical_frame</span>
+    <span class="l l-Scalar l-Scalar-Plain">camera_intermediate_frame</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/camera_link</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_ax</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.990</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_ay</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.001</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_az</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.992</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_x</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.399</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_y</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.994</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_z</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.599</span>
+    <span class="l l-Scalar l-Scalar-Plain">focal_length_x</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">529.49</span>
+    <span class="l l-Scalar l-Scalar-Plain">focal_length_y</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">529.29</span>
+    <span class="l l-Scalar l-Scalar-Plain">center_x</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">563</span>
+    <span class="l l-Scalar l-Scalar-Plain">center_y</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">463</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_k1</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.001</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_k2</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.009</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_k3</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.009</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_p1</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.009</span>
+    <span class="l l-Scalar l-Scalar-Plain">distortion_p2</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.007</span>
+
+<span class="l l-Scalar l-Scalar-Plain">moving_cameras</span><span class="p p-Indicator">:</span>
+ <span class="p p-Indicator">-</span>
+    <span class="l l-Scalar l-Scalar-Plain">camera_name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Basler-21135425</span>
+    <span class="l l-Scalar l-Scalar-Plain">trigger</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">NO_WAIT_TRIGGER</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Here is a list of all of the possible fields and what they are used for:</dt>
+<dd><ul class="first last simple">
+<li>camera_name - blah</li>
+<li>trigger -</li>
+<li>image_topic</li>
+<li>camera_optical_frame -</li>
+<li>camera_mounting_frame -</li>
+<li>angle_axis_ax/ay/az -</li>
+<li>position_x/y/z -</li>
+<li>camera intrinsics (focal length, center point, distortion) - optional; camera info can be pulled from the camera info topic, if available.  If not, these fields must be filled out if using a 2D camera</li>
+</ul>
+</dd>
+</dl>
+</div>
+
+
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="target_files.html" class="btn btn-neutral float-right" title="Calibration Target Files" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="calibration_files.html" class="btn btn-neutral" title="Calibration Files" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div class="footer-override">
+    <a href="http://rosindustrial.org/ric">
+      <img src="_static/footer.jpg"/>
+    </a>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  <script>
+  var pre = document.getElementsByTagName('pre');
+  for (var i = 0; i < pre.length; i++) {
+    var button = document.createElement('button');
+    button.className = 'btn-copyboard fa fa-copy btn';
+    pre[i].before(button);
+  }
+
+  var clipboard = new Clipboard('.btn-copyboard', {
+    target: function(trigger) {return trigger.nextElementSibling;}
+  });
+
+  function showSuccess(elem){elem.setAttribute('class','btn-copyboard fa fa-check btn');}
+  function sleep (time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+  }
+  clipboard.on('success',function(e){
+    showSuccess(e.trigger);
+    sleep(350).then(() => {e.clearSelection();
+      e.trigger.setAttribute('class','btn-copyboard fa fa-copy btn');})
+  });
+  </script>
+
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

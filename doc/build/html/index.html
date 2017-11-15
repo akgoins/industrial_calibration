@@ -1,0 +1,272 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to industrial_calibration’s documentation! &mdash; industrial_calibration 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="industrial_calibration 0.1 documentation" href="#"/>
+        <link rel="next" title="Test Intro" href="intro.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+  
+  <script src="_static/js/clipboard.min.js"></script>
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="#" class="icon icon-home">
+        
+
+          <br/>
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Test Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_examples.html">Calibration Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_libraries.html">Calibration Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_nodes.html">Calibration Nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_files.html">Calibration YAML Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="camera_files.html">Camera Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="target_files.html">Target Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caljob_files.html">Calibration Job Files</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">industrial_calibration</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+
+        <div class="header-override">
+          <a href="http://rosindustrial.org">
+            <img src="_static/logo.jpg"/>
+          </a>
+          <p>
+            <a href="http://rosindustrial.org">ROS-Industrial Website</a>|<a href="http://rosindustrial.org/news">Blog</a>
+          </p>
+        </div>
+
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>Welcome to industrial_calibration’s documentation!</li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             <div class="admonition note">
+               <p class="first admonition-title">The code used in this tutorial is available!</p>
+               <p class="last">Code can be found at <a href = "https://github.com/ros-industrial/industrial_training">industrial_training repository</a> in gh_pages folder. Use  branch.</p>
+             </div>
+
+            
+  <div class="section" id="welcome-to-industrial-calibration-s-documentation">
+<h1>Welcome to industrial_calibration’s documentation!<a class="headerlink" href="#welcome-to-industrial-calibration-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This repository is for performing both intrinsic and extrinsic calibration for a variety of 2D and 3D cameras.
+The intrinsic parameters of the camera (focal length, center point, distortion parameters, etc.) are primarily used
+for 2D cameras.  Depending on the type of 3D camera, intrinsic calibration may not be necessary.  Once intrinsic
+calibration is performed (if any is needed), then extrinsic calibration can be executed.  The extrinsic parameters
+refer to the cameras location in the environment (x,y,z,r,p,y).</p>
+<p>Most users will want to get started quickly calibrating a camera.  For a quick start see
+the Calibration Examples.</p>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Test Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_examples.html">Calibration Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_libraries.html">Calibration Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_nodes.html">Calibration Nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_files.html">Calibration YAML Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="camera_files.html">Camera Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="target_files.html">Target Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caljob_files.html">Calibration Job Files</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="intro.html" class="btn btn-neutral float-right" title="Test Intro" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div class="footer-override">
+    <a href="http://rosindustrial.org/ric">
+      <img src="_static/footer.jpg"/>
+    </a>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  <script>
+  var pre = document.getElementsByTagName('pre');
+  for (var i = 0; i < pre.length; i++) {
+    var button = document.createElement('button');
+    button.className = 'btn-copyboard fa fa-copy btn';
+    pre[i].before(button);
+  }
+
+  var clipboard = new Clipboard('.btn-copyboard', {
+    target: function(trigger) {return trigger.nextElementSibling;}
+  });
+
+  function showSuccess(elem){elem.setAttribute('class','btn-copyboard fa fa-check btn');}
+  function sleep (time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+  }
+  clipboard.on('success',function(e){
+    showSuccess(e.trigger);
+    sleep(350).then(() => {e.clearSelection();
+      e.trigger.setAttribute('class','btn-copyboard fa fa-copy btn');})
+  });
+  </script>
+
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
