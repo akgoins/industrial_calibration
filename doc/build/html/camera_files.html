@@ -146,7 +146,7 @@
 
             
   <div class="section" id="camera-calibration-files">
-<h1>Camera Calibration Files<a class="headerlink" href="#camera-calibration-files" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Camera Calibration Files<a class="headerlink" href="#camera-calibration-files" title="Permalink to this headline">¶</a></h1>
 <p>In order to perform calibration, you need to first define all of the cameras that you will be calibrating.
 This file specifies certain specific camera information such as image height/width, camera frame name, image topic, etc.
 The first item to identify is whether your camera is moving or static in the scene.  A static camera is one which has a fixed
@@ -207,10 +207,10 @@ transform (e.g. a statically mounted camera on the ceiling, or a statically moun
 <dl class="docutils">
 <dt>Here is a list of all of the possible fields and what they are used for:</dt>
 <dd><ul class="first last simple">
-<li>camera_name - blah</li>
+<li>camera_name - the name of the camera, used for creating the calibration job file</li>
 <li>trigger -</li>
-<li>image_topic</li>
-<li>camera_optical_frame -</li>
+<li>image_topic - the topic to grab the 2D image from</li>
+<li>camera_optical_frame - the TF frame which the 2D image is taken in</li>
 <li>camera_mounting_frame -</li>
 <li>angle_axis_ax/ay/az -</li>
 <li>position_x/y/z -</li>

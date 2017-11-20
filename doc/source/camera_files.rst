@@ -1,3 +1,5 @@
+.. _camera_calibration_files:
+
 Camera Calibration Files
 ========================
 
@@ -13,12 +15,13 @@ Here is an example camera calibration file:
    :lines: 1-50
 
 Here is a list of all of the possible fields and what they are used for:
- * camera_name - blah
+ * camera_name - the name of the camera, used for creating the calibration job file
  * trigger - 
- * image_topic
- * camera_optical_frame - 
+ * image_topic - the topic to grab the 2D image from
+ * camera_optical_frame - the TF frame which the 2D image is taken in
  * camera_mounting_frame - 
  * angle_axis_ax/ay/az - 
  * position_x/y/z - 
  * camera intrinsics (focal length, center point, distortion) - optional; camera info can be pulled from the camera info topic, if available.  If not, these fields must be filled out if using a 2D camera
+
 

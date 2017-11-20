@@ -36,7 +36,7 @@
     <link rel="top" title="industrial_calibration 0.1 documentation" href="index.html"/>
         <link rel="up" title="Calibration Files" href="calibration_files.html"/>
         <link rel="next" title="Calibration Job Files" href="caljob_files.html"/>
-        <link rel="prev" title="Calibration Camera Files" href="camera_files.html"/> 
+        <link rel="prev" title="Camera Calibration Files" href="camera_files.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -147,6 +147,99 @@
             
   <div class="section" id="calibration-target-files">
 <h1>Calibration Target Files<a class="headerlink" href="#calibration-target-files" title="Permalink to this headline">¶</a></h1>
+<p>The target file defines what the calibration target looks like that you will be using.  Most setups will use one calibration target, but it is possible to have more than one calibration target.  For example, two cameras with different focal lengths could use different sized calibration targets which are both mounted on the same surface.  Just like with the camera calibration file, there are two options for either a static target or a moving target.  Please refer to the <a class="reference internal" href="camera_files.html"><span class="doc">Camera Calibration Files</span></a> page for a description of what a static/moving target is.</p>
+<p>Here is an example target calibration file:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="l l-Scalar l-Scalar-Plain">static_targets</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span>
+    <span class="l l-Scalar l-Scalar-Plain">target_name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">CircleGrid5x7</span>
+    <span class="l l-Scalar l-Scalar-Plain">target_type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+    <span class="l l-Scalar l-Scalar-Plain">target_frame</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">target_frame</span>
+    <span class="l l-Scalar l-Scalar-Plain">target_rows</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+    <span class="l l-Scalar l-Scalar-Plain">target_cols</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">7</span>
+    <span class="l l-Scalar l-Scalar-Plain">circle_dia</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0254</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_ax</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_ay</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+    <span class="l l-Scalar l-Scalar-Plain">angle_axis_az</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_x</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_y</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+    <span class="l l-Scalar l-Scalar-Plain">position_z</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+    <span class="l l-Scalar l-Scalar-Plain">transform_interface</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ros_lti</span>
+    <span class="l l-Scalar l-Scalar-Plain">num_points</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">35</span>
+    <span class="l l-Scalar l-Scalar-Plain">points</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.000</span><span class="p p-Indicator">,</span><span class="nv">0.210</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.210</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.210</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.210</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.210</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.000</span><span class="p p-Indicator">,</span><span class="nv">0.175</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.175</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.175</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.175</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.175</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.000</span><span class="p p-Indicator">,</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.000</span><span class="p p-Indicator">,</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.000</span><span class="p p-Indicator">,</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.000</span><span class="p p-Indicator">,</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.070</span><span class="p p-Indicator">,</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.105</span><span class="p p-Indicator">,</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.140</span><span class="p p-Indicator">,</span><span class="nv">0.035</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pnt</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.000</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">,</span><span class="nv">0.000</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Here is a list of all of the possible fields and what they are used for:</p>
+<blockquote>
+<div><ul class="simple">
+<li>target_name - the name of the calibration target, to be used in the calibration job file</li>
+<li>target_type - the type of calibration target.  Possible enumerations are:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>0 = checker board</li>
+<li>1 = circle grid</li>
+<li>2 = modified circle grid (origin dot is larger than all other dots)</li>
+<li>3 = circle balls (i.e. retro reflective markers)</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>target_frame - the name of the TF frame which represents the origin of the target</li>
+<li>target_rows - the number of rows in the calibration target</li>
+<li>target_cols - the number of columns in the calibration target</li>
+<li>circle_dia - the diameter of the circles in the target</li>
+<li>angle_axis_ax/ay/az -</li>
+<li>position_x/y/z -</li>
+<li>transform_interface - the transform interface type to use when looking up the ROS TF frames.  The transform interface determines how the frame is looked up and whether the new calibration results should be pushed or not.</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>ros_lti - listener transform interface: performs a TF lookup, final calibration results will not be pushed back to the mutable joint state publisher (if available)</li>
+<li>ros_bti - broadcast transform interface: broadcasts the transform</li>
+<li>ros_camera_lti</li>
+<li>ros_camera_bti</li>
+<li>ros_camera_housing_lti</li>
+<li>ros_camera_housing_bti</li>
+<li>ros_camera_housing_cti</li>
+<li>ros_scti</li>
+<li>ros_camera_scti</li>
+<li>ros_default_ti</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<p>End of list</p>
 </div>
 
 
@@ -160,7 +253,7 @@
         <a href="caljob_files.html" class="btn btn-neutral float-right" title="Calibration Job Files" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="camera_files.html" class="btn btn-neutral" title="Calibration Camera Files" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="camera_files.html" class="btn btn-neutral" title="Camera Calibration Files" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
