@@ -16,7 +16,7 @@ Here is an example camera calibration file:
 
 Here is a list of all of the possible fields and what they are used for:
  * camera_name - the name of the camera, used for creating the calibration job file
- * trigger - 
+ * trigger - See :doc:`trigger_type` for more information
  * image_topic - the topic to grab the 2D image from
  * camera_optical_frame - the TF frame which the 2D image is taken in
  * camera_mounting_frame - 

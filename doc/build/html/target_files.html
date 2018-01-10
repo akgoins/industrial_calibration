@@ -88,7 +88,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="calibration_files.html">Calibration YAML Files</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="camera_files.html">Camera Files</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Target Files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="caljob_files.html">Calibration Job Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caljob_files.html">Calibration Job Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="caljob_files.html#cost-functions">Cost Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transform_interface.html">Transform Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trigger_type.html">Trigger Types</a></li>
 </ul>
 </li>
 </ul>
@@ -222,22 +227,9 @@
 <li>circle_dia - the diameter of the circles in the target</li>
 <li>angle_axis_ax/ay/az -</li>
 <li>position_x/y/z -</li>
-<li>transform_interface - the transform interface type to use when looking up the ROS TF frames.  The transform interface determines how the frame is looked up and whether the new calibration results should be pushed or not.</li>
+<li>transform_interface - See <a class="reference internal" href="transform_interface.html"><span class="doc">Calibration Transform Interface</span></a> for more information</li>
+<li>trigger - See <a class="reference internal" href="trigger_type.html"><span class="doc">Trigger Types</span></a> for more information</li>
 </ul>
-<blockquote>
-<div><ul class="simple">
-<li>ros_lti - listener transform interface: performs a TF lookup, final calibration results will not be pushed back to the mutable joint state publisher (if available)</li>
-<li>ros_bti - broadcast transform interface: broadcasts the transform</li>
-<li>ros_camera_lti</li>
-<li>ros_camera_bti</li>
-<li>ros_camera_housing_lti</li>
-<li>ros_camera_housing_bti</li>
-<li>ros_camera_housing_cti</li>
-<li>ros_scti</li>
-<li>ros_camera_scti</li>
-<li>ros_default_ti</li>
-</ul>
-</div></blockquote>
 </div></blockquote>
 <p>End of list</p>
 </div>

@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -9,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; industrial_calibration 0.1 documentation</title>
+  <title>Trigger Types &mdash; industrial_calibration 0.1 documentation</title>
   
 
   
@@ -32,9 +31,11 @@
 
   
         <link rel="index" title="Index"
-              href="#"/>
+              href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="industrial_calibration 0.1 documentation" href="index.html"/> 
+    <link rel="top" title="industrial_calibration 0.1 documentation" href="index.html"/>
+        <link rel="up" title="Calibration Files" href="calibration_files.html"/>
+        <link rel="prev" title="Calibration Transform Interface" href="transform_interface.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -78,12 +79,12 @@
           
           
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Test Intro</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibration_examples.html">Calibration Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibration_libraries.html">Calibration Libraries</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibration_nodes.html">Calibration Nodes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calibration_files.html">Calibration YAML Files</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="calibration_files.html">Calibration YAML Files</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="camera_files.html">Camera Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="target_files.html">Target Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="caljob_files.html">Calibration Job Files</a><ul>
@@ -91,7 +92,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="transform_interface.html">Transform Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trigger_type.html">Trigger Types</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Trigger Types</a></li>
 </ul>
 </li>
 </ul>
@@ -128,11 +129,15 @@
     <li class="wy-breadcrumbs-aside">
       
         
+          <a href="_sources/trigger_type.rst.txt" rel="nofollow"> View page source</a>
+        
       
     </li>
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Index</li>
+          <li><a href="calibration_files.html">Calibration Files</a> &raquo;</li>
+      
+    <li>Trigger Types</li>
   </ul>
   <hr/>
 </div>
@@ -144,11 +149,18 @@
              </div>
 
             
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
+  <div class="section" id="trigger-types">
+<h1>Trigger Types<a class="headerlink" href="#trigger-types" title="Permalink to this headline">¶</a></h1>
+<p>The trigger type specifies how and when the image/calibration is acquired.</p>
+<blockquote>
+<div><ul class="simple">
+<li>NO_WAIT_TRIGGER -</li>
+<li>ROS_PARAM_TRIGGER -</li>
+<li>ROS_ACTION_TRIGGER -</li>
+<li>ROS_ROBOT_JOINT_VALUES_ACTION_TRIGGER -</li>
+<li>ROS_ROBOT_POSE_ACTION_TRIGGER -</li>
+</ul>
+</div></blockquote>
 </div>
 
 
@@ -156,6 +168,13 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="transform_interface.html" class="btn btn-neutral" title="Calibration Transform Interface" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

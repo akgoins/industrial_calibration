@@ -24,16 +24,7 @@ Here is a list of all of the possible fields and what they are used for:
  * circle_dia - the diameter of the circles in the target
  * angle_axis_ax/ay/az - 
  * position_x/y/z - 
- * transform_interface - the transform interface type to use when looking up the ROS TF frames.  The transform interface determines how the frame is looked up and whether the new calibration results should be pushed or not.
-  * ros_lti - listener transform interface: performs a TF lookup, final calibration results will not be pushed back to the mutable joint state publisher (if available)
-  * ros_bti - broadcast transform interface: broadcasts the transform
-  * ros_camera_lti
-  * ros_camera_bti
-  * ros_camera_housing_lti
-  * ros_camera_housing_bti
-  * ros_camera_housing_cti
-  * ros_scti
-  * ros_camera_scti
-  * ros_default_ti
+ * transform_interface - See :doc:`transform_interface` for more information
+ * trigger - See :doc:`trigger_type` for more information
 
 End of list

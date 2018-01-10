@@ -88,7 +88,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="calibration_files.html">Calibration YAML Files</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Camera Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="target_files.html">Target Files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="caljob_files.html">Calibration Job Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caljob_files.html">Calibration Job Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="caljob_files.html#cost-functions">Cost Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transform_interface.html">Transform Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trigger_type.html">Trigger Types</a></li>
 </ul>
 </li>
 </ul>
@@ -208,7 +213,7 @@ transform (e.g. a statically mounted camera on the ceiling, or a statically moun
 <dt>Here is a list of all of the possible fields and what they are used for:</dt>
 <dd><ul class="first last simple">
 <li>camera_name - the name of the camera, used for creating the calibration job file</li>
-<li>trigger -</li>
+<li>trigger - See <a class="reference internal" href="trigger_type.html"><span class="doc">Trigger Types</span></a> for more information</li>
 <li>image_topic - the topic to grab the 2D image from</li>
 <li>camera_optical_frame - the TF frame which the 2D image is taken in</li>
 <li>camera_mounting_frame -</li>
