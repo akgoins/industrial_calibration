@@ -1,6 +1,6 @@
-kinect_link_pitch_joint: 1.367377652803638
-kinect_link_roll_joint: -1.025226166315329
-kinect_link_x_joint: 0.2710125140664753
-kinect_link_y_joint: 0.08023253991719589
-kinect_link_yaw_joint: 0.5135069155563793
-kinect_link_z_joint: 1.187566658785114
+camera_link_pitch_joint: 1.50993242802232
+camera_link_roll_joint: 2.697796325976709
+camera_link_x_joint: 0.2223280834419799
+camera_link_y_joint: 0.4270371827138482
+camera_link_yaw_joint: -2.016477530137093
+camera_link_z_joint: 1.245732349490588

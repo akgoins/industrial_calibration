@@ -33,7 +33,7 @@
 
 
 
-const unsigned int DepthCalibrator::VERSION_NUMBER_ = 1;
+const unsigned int DepthCalibrator::VERSION_NUMBER_ = 2;
 
 DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
 {
@@ -551,7 +551,11 @@ bool DepthCalibrator::findTarget(const double &final_cost, geometry_msgs::Pose& 
   industrial_extrinsic_cal::find_target::Response target_response;
   target_request.allowable_cost_per_observation = 5000.0;
 
-
+  if(!get_target_pose_.waitForExistence(ros::Duration(3)))
+  {
+    ROS_ERROR_STREAM("Service " << get_target_pose_.getService().c_str() << " does not exist.");
+    rtn = false;
+  }
   if(!get_target_pose_.call(target_request, target_response))
   {
     ROS_ERROR("Failed to get target pose.");

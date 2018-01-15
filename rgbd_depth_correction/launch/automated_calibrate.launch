@@ -14,7 +14,7 @@
 
   <node pkg="rgbd_depth_correction" type="automated_depth_calibration"
   name="automated_calibration_node" output="screen"  required="true">
-    <param name="~start_rail_location" value="0.8"/>
+    <param name="~start_rail_location" value="0.6"/>
     <param name="~end_rail_location" value="0.0"/>
     <param name="~data_points" value="5"/>
   </node>

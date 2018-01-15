@@ -1,0 +1,10 @@
+filter_by_area: True
+filter_by_circularity: True
+min_area: 50
+max_area: 5000
+min_circularity: 0.8
+max_circularity: 1.1
+min_threshold: 100
+max_threshold: 255
+min_distance: 5.0
+

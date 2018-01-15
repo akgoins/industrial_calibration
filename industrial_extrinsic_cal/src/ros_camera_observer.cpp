@@ -33,7 +33,10 @@ ROSCameraObserver::ROSCameraObserver(const std::string &camera_topic, const std:
   image_topic_ = camera_topic;  
   results_pub_ = nh_.advertise<sensor_msgs::Image>("observer_results_image", 100);
   debug_pub_ = nh_.advertise<sensor_msgs::Image>("observer_raw_image", 100);
-  std::string set_camera_info_service = camera_name_ + "/set_camera_info";
+
+  int pos = image_topic_.find_last_of('/');
+  std::string topic = image_topic_.substr(0, pos);
+  std::string set_camera_info_service = topic + "/set_camera_info";
   client_ = nh_.serviceClient<sensor_msgs::SetCameraInfo>(set_camera_info_service); 
 
   ros::NodeHandle pnh("~");
@@ -733,7 +736,10 @@ bool ROSCameraObserver::pushCameraInfo(double &fx,
     return(false);
   }
   // must pull to get all the header information that we don't compute
-  std::string camera_info_topic = camera_name_+"/camera_info";
+  int pos = image_topic_.find_last_of('/');
+  std::string topic = image_topic_.substr(0, pos);
+
+  std::string camera_info_topic = topic+"/camera_info";
   const sensor_msgs::CameraInfoConstPtr& info_msg = ros::topic::waitForMessage<sensor_msgs::CameraInfo>(camera_info_topic);
   srv_.request.camera_info.distortion_model = info_msg->distortion_model;
   srv_.request.camera_info.header = info_msg->header;

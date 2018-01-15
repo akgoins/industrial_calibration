@@ -15,7 +15,7 @@
 
   <node pkg="rgbd_depth_correction" type="depth_calibration" name="depth_cal_node" output="screen" >
 
-    <remap from="target_pose" to="/RangeExCalService" />
+    <remap from="target_pose" to="/camera_calibration_node/calibrate_camera" />
 
     <remap from="depth_points" to="/camera/depth_registered/points" />
     <remap from="image" to="/camera/rgb/image_rect_color" />
@@ -39,4 +39,49 @@
   <node name="image_view" pkg="image_view" type="image_view">
     <remap from="image" to="/camera/rgb/image_rect_color" />
   </node>
+
+
+<arg name="cal_urdf_path" value="$(find industrial_extrinsic_cal)/urdf/camera_scene.urdf" />
+<arg name="save_location" default="$(find industrial_extrinsic_cal)/yaml" />
+
+<group  >
+    <!-- Load robot description -->
+    <param name="robot_description" textfile="$(arg cal_urdf_path)" />
+
+    <!-- Launch robot state/joint state publishers for camera and target -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" >
+      <param name="publish_frequency" value="50" />
+    </node>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+      <rosparam param="source_list">[/mutable_joint_states]</rosparam>
+    </node>
+
+ <node  name="mutable_joint_state_publisher" pkg="industrial_extrinsic_cal" type="mutable_joint_state_publisher" >
+    <param name="mutable_joint_state_yaml_file" value="$(arg save_location)/camera_scene_mutable_joint_states.yaml" />
+    <param name="overwrite_mutable_values" value="true" />
+  </node>
+<!-- launch-prefix="xterm -e gdb -args" -->
+<node pkg="industrial_extrinsic_cal" type="rgb_depth_excal" name="camera_calibration_node" output="screen" >
+   <param name="yaml_file_path" value="$(find industrial_extrinsic_cal)/yaml/" />
+   <remap from="calibration_service" to="camera1_calibration_service"/>
+
+   <param name="use_circle_detector" value="true" />
+   <param name="image_topic" value="/camera/rgb/image_raw" />
+   <param name="cloud_topic" value="/camera/depth_registered/points" />
+   <param name="camera_name" value="camera" />
+   <param name="image_height" value="480" />
+   <param name="image_width" value="640" />
+   <param name="target_frame" value="camera_rgb_optical_frame" />
+   <param name="camera_mounting_frame" value="target_frame" />
+   <param name="camera_frame" value="camera_link" />
+   <param name="ROI_xmin" value="0" />
+   <param name="ROI_ymin" value="0" />
+   <param name="ROI_xmax" value="640" />
+   <param name="ROI_ymax" value="480" />
+   <param name="target_rows" value="11" />
+   <param name="target_cols" value="15" />
+   <param name="target_circle_dia" value="0.02" />
+   <param name="target_spacing" value="0.04" />
+  </node>
+  </group>
 </launch>

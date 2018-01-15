@@ -12,13 +12,13 @@
 
   <node pkg="intrinsic_cal" type="robocyl_ical" name="robocyl_intrinsic_calibration" output="screen" >
           <param name="image_topic" value="/camera/rgb/image_raw" />
-          <param name="camera_name" value="camera/rgb" />
-          <param name="target_rows" value="18" />
-          <param name="target_cols" value="24" />
-          <param name="target_circle_dia" value="0.015" />
-          <param name="target_spacing" value="0.025" />
-          <param name="num_camera_locations" value="8" />
-          <param name="camera_spacing" value="0.10" />
+          <param name="camera_name" value="camera" />
+          <param name="target_rows" value="11" />
+          <param name="target_cols" value="15" />
+          <param name="target_circle_dia" value="0.020" />
+          <param name="target_spacing" value="0.040" />
+          <param name="num_camera_locations" value="16" />
+          <param name="camera_spacing" value="0.05" />
           <param name="image_height" value="480" />
           <param name="image_width" value="640" />
           <param name="target_to_rail_distance" value="1.0" />
@@ -33,6 +33,13 @@
 
           <remap from="color_image" to="camera/rgb/image_raw" />
   </node>
+
+  <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam" output="screen"
+    args="load /robocyl_intrinsic_calibration/camera $(find industrial_extrinsic_cal)/config/reconfig.yaml">
+  </node>
+
+
+
   <!--
   <node name="observation_view" pkg="image_view" type="image_view" >
       <remap to="/observer_results_image" from="image"/>

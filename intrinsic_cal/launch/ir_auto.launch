@@ -13,17 +13,18 @@
   <node pkg="intrinsic_cal" type="robocyl_ical" name="robocyl_intrinsic_calibration" output="screen" >
           <param name="image_topic" value="/camera/ir/image" />
           <param name="camera_name" value="camera/ir" />
-          <param name="target_rows" value="18" />
-          <param name="target_cols" value="24" />
-          <param name="target_circle_dia" value="0.015" />
-          <param name="target_spacing" value="0.025" />
-          <param name="num_camera_locations" value="8" />
-          <param name="camera_spacing" value=".10" />
+          <param name="target_rows" value="11" />
+          <param name="target_cols" value="15" />
+          <param name="target_circle_dia" value="0.020" />
+          <param name="target_spacing" value="0.040" />
+          <param name="num_camera_locations" value="15" />
+          <param name="camera_spacing" value=".05" />
           <param name="image_height" value="480" />
           <param name="image_width" value="640" />
           <param name="target_to_rail_distance" value="2.0" />
           <param name="use_circle_detector" value="true"/>
           <param name="move_client" value="/move_meters"/>
+          <param name="min_threshold" value="50"/>
 
           <param name="allowable_cost_per_observation" value="1.0"/>
           <param name="auto" value="$(arg auto)"/>

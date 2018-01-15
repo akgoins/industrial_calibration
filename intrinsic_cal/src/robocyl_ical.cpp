@@ -107,7 +107,9 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
   camera_->trigger_ = shared_ptr<NoWaitTrigger>(new NoWaitTrigger());
   camera_->camera_observer_ = shared_ptr<ROSCameraObserver>(new ROSCameraObserver(image_topic_, camera_name_));
 
-  ros::service::waitForService("/"+camera_name_+"/rgb/set_camera_info",ros::Duration(15)); //should be wait for message to match pull camera info method
+  int pos = image_topic_.find_last_of('/');
+  std::string topic = image_topic_.substr(0, pos);
+  ros::service::waitForService(topic+"/set_camera_info",ros::Duration(15)); //should be wait for message to match pull camera info method
   if(!camera_->camera_observer_->pullCameraInfo(camera_->camera_parameters_.focal_length_x,
                                            camera_->camera_parameters_.focal_length_y,
                                            camera_->camera_parameters_.center_x,
@@ -186,17 +188,16 @@ void RobocylCalService::manualCal()
 
   //move rail to front
   while(true){
+    float rail_front_location = 0.8;
     ROS_WARN_STREAM("SET RAIL TO 0.8 then enter the command: \nrostopic pub --once /manual_cal intrinsic_cal/rail_ical_location \"rail_location: 0.0\")");
     const std::string message_topic = "/manual_cal";
     intrinsic_cal::rail_ical_location command = *(ros::topic::waitForMessage<intrinsic_cal::rail_ical_location>(message_topic));
-    if(command.rail_location==0.8){
-      ReportPose(0.0,TtoC2);
+    if(command.rail_location == rail_front_location){
+      ReportPose(rail_front_location,TtoC2);
       break;
     }
     else ROS_WARN_STREAM("Move rail to 0.8 meters");
   }
-
-  allowable_cost_per_observation_  =allowable_cost_per_observation_/3;
 
   C2toT = TtoC2.getInverse(); // this transform points in C2 frame into Target frame
   C2toC1 = TtoC1*C2toT; // this transforms points in C2 frame into Target then into C1 frame as one multiply
@@ -287,15 +288,21 @@ void RobocylCalService::autoCal()
   Pose6d TtoC1, TtoC2; // transforms points in target frame into either Camera1 or Camera2 frames
   Pose6d C2toT; // transforms points in camera1,2 frames into Target Frame
   Pose6d C2toC1; // transform points in camera2 frame into camera1 frame
-  allowable_cost_per_observation_  = 3*allowable_cost_per_observation_;
 
-  MoveAndReportPose(0.0,TtoC1);
-  MoveAndReportPose((num_camera_locations_-1)*camera_spacing_,TtoC2);
-
-  allowable_cost_per_observation_  =allowable_cost_per_observation_/3;
+  if(!MoveAndReportPose(0.0, TtoC1))
+  {
+    ROS_ERROR("Could not find target at location 0.  Shutting down node.");
+    return;
+  }
+  if(!MoveAndReportPose((num_camera_locations_ - 1) * camera_spacing_, TtoC2))
+  {
+    ROS_ERROR_STREAM("Could not find target at location " << (num_camera_locations_-1)*camera_spacing_ << ". Shutting down node. ");
+    return;
+  }
 
   C2toT = TtoC2.getInverse(); // this transform points in C2 frame into Target frame
-  C2toC1 = TtoC1*C2toT; // this transforms points in C2 frame into Target then into C1 frame as one multiply
+  C2toC1 = C2toT*TtoC1; // this transforms points in C2 frame into Target then into C1 frame as one multiply
+  C2toC1 = C2toC1.getInverse();
   tf::Vector3 mv = C2toC1.getOrigin(); // the origin is the vector in C1 coordinates
   mv.normalize();
 
@@ -340,21 +347,21 @@ void RobocylCalService::autoCal()
       ROS_INFO("Found %d observations",(int) camera_observations.size());
       num_observations = (int) camera_observations.size();
       if(num_observations != target_rows_* target_cols_){
-  ROS_ERROR("Target Locator could not find target %d", num_observations);
+        ROS_ERROR("Target Locator could not find target %d", num_observations);
       }
       else{
-  // add a new cost to the problem for each observation
-  CostFunction* cost_function[num_observations];
-  total_observations += num_observations;
-  for(int i=0; i<num_observations; i++){
-    double image_x = camera_observations[i].image_loc_x;
-    double image_y = camera_observations[i].image_loc_y;
-    Point3d point = target_->pts_[camera_observations[i].point_id]; // don't assume ordering from camera observer
-    cost_function[i] = industrial_extrinsic_cal::RailICal3::Create(image_x, image_y, rail_position, point);
-    problem.AddResidualBlock(cost_function[i], NULL ,
-           camera_->camera_parameters_.pb_intrinsics,
-           target_->pose_.pb_pose);
-  } // for each observation at this camera_location
+        // add a new cost to the problem for each observation
+        CostFunction* cost_function[num_observations];
+        total_observations += num_observations;
+        for(int i=0; i<num_observations; i++){
+          double image_x = camera_observations[i].image_loc_x;
+          double image_y = camera_observations[i].image_loc_y;
+          Point3d point = target_->pts_[camera_observations[i].point_id]; // don't assume ordering from camera observer
+          cost_function[i] = industrial_extrinsic_cal::RailICal3::Create(image_x, image_y, rail_position, point);
+          problem.AddResidualBlock(cost_function[i], NULL ,
+                 camera_->camera_parameters_.pb_intrinsics,
+                 target_->pose_.pb_pose);
+        } // for each observation at this camera_location
       } // end target size matches observation number
     }// end if get observations successful
   }// end for each camera location

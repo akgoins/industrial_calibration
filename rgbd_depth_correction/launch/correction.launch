@@ -35,22 +35,22 @@
    <remap from="calibration_service" to="camera1_calibration_service"/>
 
    <param name="use_circle_detector" value="true" />
-   <param name="image_topic" value="/camera/rgb/image_raw" />
-   <param name="cloud_topic" value="/camera/depth_registered/points" />
+   <param name="image_topic" value="/$(arg camera)/rgb/image_raw" />
+   <param name="cloud_topic" value="/$(arg camera)/depth_registered/points" />
    <param name="camera_name" value="camera" />
    <param name="image_height" value="480" />
    <param name="image_width" value="640" />
-   <param name="target_frame" value="camera_rgb_optical_frame" />
+   <param name="target_frame" value="$(arg camera)_rgb_optical_frame" />
    <param name="camera_mounting_frame" value="target_frame" />
-   <param name="camera_frame" value="camera_link" />
+   <param name="camera_frame" value="$(arg camera)_link" />
    <param name="ROI_xmin" value="0" />
    <param name="ROI_ymin" value="0" />
    <param name="ROI_xmax" value="640" />
    <param name="ROI_ymax" value="480" />
-   <param name="target_rows" value="18" />
-   <param name="target_cols" value="24" />
-   <param name="target_circle_dia" value="0.015" />
-   <param name="target_spacing" value="0.025" />
+   <param name="target_rows" value="11" />
+   <param name="target_cols" value="15" />
+   <param name="target_circle_dia" value="0.02" />
+   <param name="target_spacing" value="0.04" />
   </node>
 
   <node  name="mutable_joint_state_publisher" pkg="industrial_extrinsic_cal" type="mutable_joint_state_publisher" >
@@ -76,8 +76,9 @@
       <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg cal_pkg_path)/config/kinect_calibration.rviz" required ="true"/>
     </group>
   </group>
-    <node pkg="tf" type="static_transform_publisher" name="t2_frame" args="0.575 0 0 0 0 0 target_frame t2_frame 100" />
-    <node pkg="tf" type="static_transform_publisher" name="t3_frame" args="0 0.425 0 0 0 0 target_frame t3_frame 100" />
-    <node pkg="tf" type="static_transform_publisher" name="t4_frame" args="0.575 0.425 0 0 0 0 target_frame t4_frame 100" />
+    <node pkg="tf" type="static_transform_publisher" name="t2_frame" args="0.560 0 0 0 0 0 target_frame t2_frame 100" />
+    <node pkg="tf" type="static_transform_publisher" name="t3_frame" args="0 0.40 0 0 0 0 target_frame t3_frame 100" />
+    <node pkg="tf" type="static_transform_publisher" name="t4_frame" args="0.56 0.40 0 0 0 0 target_frame t4_frame 100" />
 
+  <include file="$(find robo_cylinder)/launch/robo_cylinder.launch" />
 </launch>
