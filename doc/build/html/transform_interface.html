@@ -92,7 +92,10 @@
 <li class="toctree-l3"><a class="reference internal" href="caljob_files.html#cost-functions">Cost Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Transform Interface</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Transform Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#transform-use-cases">Transform Use Cases</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="trigger_type.html">Trigger Types</a></li>
 </ul>
 </li>
@@ -158,16 +161,16 @@ transform interfaces are provided, but not all of them currently have a use case
 <p>Transform interface determines how the frame is looked up and whether the new calibration results should be pushed or not.</p>
 <blockquote>
 <div><ul class="simple">
-<li>ros_lti - ROSListenerTransInterface: performs a TF lookup, final calibration results will not be pushed back to the mutable joint state publisher (if available).  This is used primarily if a transform is needed for calibration (i.e. a fixed calibration target) but the transform is already known or is calibrated by some other means.  For example if a calibration target position is found by touching off using a robot tool tip and the transform is manually entered into the URDF, then a listener transform interface can be used to look up the transform when trying to calibrate a camera since the target transform has already been calibrated and fixed.</li>
-<li>ros_bti - ROSBroadcastTransInterface: publishes a transform pose to the TF topic.  This is used when you want to have some quick feedback on the location of a transform.  For example, if this interface is used when calibrating a target, the current target transform will be published.  This interface should not be used if the TF frames already are being published by another node or if the frames exist in the URDF as they will be published by the robot state publisher.</li>
-<li>ros_camera_lti - ROSCameraListenerTransInterface: This is functionally the same as the ros_lti interface</li>
-<li>ros_camera_bti - ROSCameraBroadcastTransInterface: This is functionally the same as the ros_bti interface except that the resulting calibrated transform is inverted before being pushed.  This is used for cameras since the calibration target points must be transformed into the camera’s frame of reference (T camera-&gt;world * T world-&gt;target) but the transform that is published is inverted (T world-&gt;camera).</li>
-<li>ros_camera_housing_lti - ROSCameraHousingListenerTInterface:  This is similar to the ros_lti except that it allows having a fixed translation/rotation after the transform being optimized.  This used used in the case that there is a camera/device which one or more lenses which are not located at the base frame of the device.  For example, the ASUS and Kinect have two cameras (rgb and ir) which have a fixed, known offset from the camera housing base.  The calibration job needs to calibrate the transform for the base of the camera, however, the image data is being published in their respective camera lens frames.  This can also be used for stereo pair cameras which have a left/right lens.</li>
-<li>ros_camera_housing_bti - ROSCameraHousingBroadcastTInterface: This is functionally the same as the ros_bti interface except that the resulting calibrated transform is inverted before being pushed.  This is used for cameras since the calibration target points must be transformed into the camera’s frame of reference (T camera-&gt;world * T world-&gt;target) but the transform that is published is inverted (T world-&gt;camera).</li>
-<li>ros_camera_housing_cti - ROSCameraHousingCalTInterface: This interface is used in conjunction with the mutable joint state publisher and allows for both pulling and pushing transforms.  The resulting calibrated transform is inverted before being pushed.  This is used for cameras since the calibration target points must be transformed into the camera’s frame of reference (T camera-&gt;world * T world-&gt;target) but the transform that is published is inverted (T world-&gt;camera).</li>
-<li>ros_scti - ROSSimpleCalTInterface: This interface is used in conjunction with the mutable joint state publisher and allows for both pulling and pushing transforms.  For use with targets.  Pushes the un-inverted transform.</li>
-<li>ros_camera_scti - ROSSimpleCameraCalTInterface: This interface is used in conjunction with the mutable joint state publisher and allows for both pulling and pushing transforms.  For use with cameras.  The resulting calibrated transform is inverted before being pushed.  This is used for cameras since the calibration target points must be transformed into the camera’s frame of reference (T camera-&gt;world * T world-&gt;target) but the transform that is published is inverted (T world-&gt;camera).</li>
-<li>ros_default_ti - DefaultTransformInterface:</li>
+<li><strong>ros_lti</strong> - ROSListenerTransInterface: performs a TF lookup, final calibration results will not be pushed back to the mutable joint state publisher (if available).  This is used primarily if a transform is needed for calibration (i.e. a fixed calibration target) but the transform is already known or is calibrated by some other means.  For example if a calibration target position is found by touching off using a robot tool tip and the transform is manually entered into the URDF, then a listener transform interface can be used to look up the transform when trying to calibrate a camera since the target transform has already been calibrated and fixed.</li>
+<li><strong>ros_bti</strong> - ROSBroadcastTransInterface: publishes a transform pose to the TF topic.  This is used when you want to have some quick feedback on the location of a transform.  For example, if this interface is used when calibrating a target, the current target transform will be published.  This interface should not be used if the TF frames already are being published by another node or if the frames exist in the URDF as they will be published by the robot state publisher.</li>
+<li><strong>ros_camera_lti</strong> - ROSCameraListenerTransInterface: This is functionally the same as the ros_lti interface except that the transform returned is the inverse.</li>
+<li><strong>ros_camera_bti</strong> - ROSCameraBroadcastTransInterface: This is functionally the same as the ros_bti interface except that the resulting calibrated transform is inverted before being pushed.  This is used for cameras since the calibration target points must be transformed into the camera’s frame of reference (T camera-&gt;world * T world-&gt;target) but the transform that is published is inverted (T world-&gt;camera).</li>
+<li><strong>ros_camera_housing_lti</strong> - ROSCameraHousingListenerTInterface:  This is similar to the ros_lti except that it allows having a fixed translation/rotation after the transform being optimized.  This used used in the case that there is a camera/device which one or more lenses which are not located at the base frame of the device.  For example, the ASUS and Kinect have two cameras (rgb and ir) which have a fixed, known offset from the camera housing base.  The calibration job needs to calibrate the transform for the base of the camera, however, the image data is being published in their respective camera lens frames.  This can also be used for stereo pair cameras which have a left/right lens.</li>
+<li><strong>ros_camera_housing_bti</strong> - ROSCameraHousingBroadcastTInterface: This is functionally the same as the ros_bti interface except that the resulting calibrated transform is inverted before being pushed.  This is used for cameras since the calibration target points must be transformed into the camera’s frame of reference (T camera-&gt;world * T world-&gt;target) but the transform that is published is inverted (T world-&gt;camera).</li>
+<li><strong>ros_camera_housing_cti</strong> - ROSCameraHousingCalTInterface: This interface is used in conjunction with the mutable joint state publisher and allows for both pulling and pushing transforms.  The resulting calibrated transform is inverted before being pushed.  This is used for cameras since the calibration target points must be transformed into the camera’s frame of reference (T camera-&gt;world * T world-&gt;target) but the transform that is published is inverted (T world-&gt;camera).</li>
+<li><strong>ros_scti</strong> - ROSSimpleCalTInterface: This interface is used in conjunction with the mutable joint state publisher and allows for both pulling and pushing transforms.  For use with targets.  Pushes the un-inverted transform.</li>
+<li><strong>ros_camera_scti</strong> - ROSSimpleCameraCalTInterface: This interface is used in conjunction with the mutable joint state publisher and allows for both pulling and pushing transforms.  For use with cameras.  The resulting calibrated transform is inverted before being pushed.  This is used for cameras since the calibration target points must be transformed into the camera’s frame of reference (T camera-&gt;world * T world-&gt;target) but the transform that is published is inverted (T world-&gt;camera).</li>
+<li><strong>ros_default_ti</strong> - DefaultTransformInterface: This interface is used if one is not provided or the name does not match on in the available list.  This interface does not provide any functionality to lookup or publish a transform and is only for preventing any runtime errors if a transform interface is not provided.</li>
 </ul>
 </div></blockquote>
 <p>Here is a summary of the different transform interfaces and how they work:</p>
@@ -198,7 +201,7 @@ Offset</th>
 <td>N/A</td>
 </tr>
 <tr class="row-odd"><td>ros_bti</td>
-<td>?</td>
+<td>no</td>
 <td>yes</td>
 <td>none</td>
 <td>save to launch file</td>
@@ -206,53 +209,71 @@ Offset</th>
 <tr class="row-even"><td>ros_camera_lti</td>
 <td>yes</td>
 <td>no</td>
-<td>no</td>
+<td>yes</td>
 <td>N/A</td>
 </tr>
 <tr class="row-odd"><td>ros_camera_bti</td>
-<td>&#160;</td>
-<td>yes, inverted</td>
 <td>no</td>
+<td>yes, inverted</td>
+<td>yes?</td>
 <td>save to launch file</td>
 </tr>
 <tr class="row-even"><td>ros_camera_housing_lti</td>
-<td>a</td>
+<td>yes</td>
 <td>no</td>
 <td>yes</td>
 <td>N/A</td>
 </tr>
 <tr class="row-odd"><td>ros_camera_housing_bti</td>
-<td>a</td>
+<td>no</td>
 <td>yes, inverted</td>
 <td>yes</td>
 <td>save to launch file</td>
 </tr>
 <tr class="row-even"><td>ros_camera_housing_cti</td>
-<td>a</td>
-<td>a</td>
+<td>yes</td>
+<td>yes, inverted</td>
 <td>yes</td>
 <td>mutable joint states</td>
 </tr>
 <tr class="row-odd"><td>ros_scti</td>
-<td>a</td>
-<td>a</td>
+<td>yes</td>
+<td>yes</td>
 <td>no</td>
 <td>mutable joint states</td>
 </tr>
 <tr class="row-even"><td>ros_camera_scti</td>
-<td>a</td>
-<td>a</td>
+<td>yes</td>
+<td>yes, inverted</td>
 <td>no</td>
 <td>mutable joint states</td>
 </tr>
 <tr class="row-odd"><td>ros_default_ti</td>
-<td>a</td>
-<td>a</td>
 <td>no</td>
-<td>a</td>
+<td>no</td>
+<td>no</td>
+<td>N/A</td>
 </tr>
 </tbody>
 </table>
+<div class="section" id="transform-use-cases">
+<h2>Transform Use Cases<a class="headerlink" href="#transform-use-cases" title="Permalink to this headline">¶</a></h2>
+<p>Here is a short description on some of the use cases for each transform interface.</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>ros_lti</strong> - None</li>
+<li><strong>ros_bti</strong> - None</li>
+<li><strong>ros_camera_lti</strong> - None</li>
+<li><strong>ros_camera_bti</strong> - None</li>
+<li><strong>ros_camera_housing_lti</strong> - None</li>
+<li><strong>ros_camera_housing_bti</strong> - None</li>
+<li><strong>ros_camera_housing_cti</strong> - Calibrating a camera which has multiple lenses that are not located at the camera base link.</li>
+<li><strong>ros_scti</strong> - Calibrating a calibration target</li>
+<li><strong>ros_camera_scti</strong> - Calibrating a camera which has a single lens for which the transform is located in the lens optical center.</li>
+<li><strong>ros_default_ti</strong> - None</li>
+</ul>
+</div></blockquote>
+</div>
 </div>
 
 
