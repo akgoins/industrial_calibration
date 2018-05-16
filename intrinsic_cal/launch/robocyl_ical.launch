@@ -21,7 +21,7 @@
           <param name="camera_spacing" value=".10" />
           <param name="image_height" value="480" />
           <param name="image_width" value="640" />
-          <param name="target_to_rail_distance" value="2.0" />
+          <param name="target_to_rail_distance" value="1.0" />
           <param name="use_circle_detector" value="true"/>
           <param name="allowable_cost_per_observation" value="1.0"/>
           <param name="move_client" value="/move_meters"/>

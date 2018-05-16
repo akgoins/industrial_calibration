@@ -88,6 +88,7 @@ RobocylCalService::RobocylCalService(ros::NodeHandle nh)
   rgb_sub_ = nh_.subscribe("color_image", queue_size, &RobocylCalService::cameraCallback, this);
   rgb_pub_ = nh_.advertise<sensor_msgs::Image>("color_image_center", 1);
 
+  ros::spinOnce();
   if(!use_quaternion)
   {
     tf::Matrix3x3 m;
@@ -174,13 +175,14 @@ void RobocylCalService::manualCal()
 
 
   //move rail to back
+  ros::spin();
   while(true){
     ROS_WARN_STREAM("SET RAIL TO 0 then enter the command: \nrostopic pub --once /manual_cal intrinsic_cal/rail_ical_location \"rail_location: 0.0\")");
     const std::string message_topic = "/manual_cal";
     intrinsic_cal::rail_ical_location command = *(ros::topic::waitForMessage<intrinsic_cal::rail_ical_location>(message_topic));
     if(command.rail_location==0.0){
       ROS_ERROR_STREAM("entered");
-      ReportPose(0.0,TtoC1);
+      ReportPose(0.0, TtoC1);
       break;
     }
     else ROS_WARN_STREAM("Move rail to 0.0 meters");
@@ -254,15 +256,15 @@ void RobocylCalService::manualCal()
   // add a new cost to the problem for each observation
   CostFunction* cost_function[num_observations];
   total_observations += num_observations;
-  for(int i=0; i<num_observations; i++){
-    double image_x = camera_observations[i].image_loc_x;
-    double image_y = camera_observations[i].image_loc_y;
-    Point3d point = target_->pts_[camera_observations[i].point_id]; // don't assume ordering from camera observer
-    cost_function[i] = industrial_extrinsic_cal::RailICal3::Create(image_x, image_y, rail_position, point);
-    problem.AddResidualBlock(cost_function[i], NULL ,
-           camera_->camera_parameters_.pb_intrinsics,
-           target_->pose_.pb_pose);
-  } // for each observation at this camera_location
+        for(int j=0; j<num_observations; j++){
+          double image_x = camera_observations[j].image_loc_x;
+          double image_y = camera_observations[j].image_loc_y;
+          Point3d point = target_->pts_[camera_observations[j].point_id]; // don't assume ordering from camera observer
+          cost_function[j] = industrial_extrinsic_cal::RailICal3::Create(image_x, image_y, rail_position, point);
+          problem.AddResidualBlock(cost_function[j], NULL ,
+                 camera_->camera_parameters_.pb_intrinsics,
+                 target_->pose_.pb_pose);
+        } // for each observation at this camera_location
       } // end target size matches observation number
     }// end if get observations successful
   }// end for each camera location

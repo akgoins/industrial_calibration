@@ -10,6 +10,10 @@
     <arg name="file" value="$(arg file)" />
   </include>
 
+    <!--include file="$(find rgbd_depth_correction)/launch/v1_calibrate.launch">
+      <arg name="file" value="$(arg file)" />
+    </include-->
+
   <include file="$(find robo_cylinder)/launch/robo_cylinder.launch" />
 
   <node pkg="rgbd_depth_correction" type="automated_depth_calibration"

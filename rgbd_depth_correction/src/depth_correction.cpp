@@ -162,7 +162,7 @@ void DepthCorrectionNodelet::pointcloudCallback(const pcl::PointCloud<pcl::Point
 {
   switch(version_)
   {
-    case 1:
+    case 2:
       correctionVersionOne(cloud);
       break;
     default:
@@ -190,7 +190,7 @@ bool DepthCorrectionNodelet::readYamlFile(const std::string &pathway, const std:
   {
     switch (version_)
     {
-      case 1:
+      case 2:
         loadVersionOne(doc, pathway + yaml_file);
         break;
       default:

@@ -18,6 +18,7 @@
 
 #include <depth_calibration/depth_calibration.h>
 #include <industrial_extrinsic_cal/find_target.h>
+#include <target_finder/target_locater.h>
 #include <boost/thread/locks.hpp>
 #include <sstream>
 
@@ -93,6 +94,7 @@ DepthCalibrator::DepthCalibrator(ros::NodeHandle& nh)
   calibrate_pixel_depth_ = nh_.advertiseService("pixel_depth_calibration", &DepthCalibrator::calibrateCameraPixelDepth, this);
   set_store_cloud_ = nh_.advertiseService("store_cloud", &DepthCalibrator::setStoreCloud, this);
   get_target_pose_ = nh.serviceClient<industrial_extrinsic_cal::find_target>("target_pose");
+  //get_target_pose_ = nh.serviceClient<target_finder::target_locater>("target_pose");
 
   this->point_cloud_sub_ = boost::shared_ptr<PointCloudSubscriberType>(new PointCloudSubscriberType(nh, "depth_points", 1));
   this->image_sub_ = boost::shared_ptr<ImageSubscriberType>(new ImageSubscriberType(nh, "image", 1));
@@ -549,6 +551,17 @@ bool DepthCalibrator::findTarget(const double &final_cost, geometry_msgs::Pose& 
   //Get target pose
   industrial_extrinsic_cal::find_target::Request target_request;
   industrial_extrinsic_cal::find_target::Response target_response;
+//  target_finder::target_locater::Request target_request;
+//  target_finder::target_locater::Response target_response;
+//  target_request.allowable_cost_per_observation = 1.0;
+//  target_request.initial_pose.position.z = 0.6;
+//  target_request.initial_pose.orientation.w = 0.0;
+//  target_request.initial_pose.orientation.x = 1.0;
+//  target_request.initial_pose.orientation.y = 0.0;
+//  target_request.initial_pose.orientation.z = 0.0;
+//  target_request.roi.width = 640;
+//  target_request.roi.height = 480;
+
   target_request.allowable_cost_per_observation = 5000.0;
 
   if(!get_target_pose_.waitForExistence(ros::Duration(3)))

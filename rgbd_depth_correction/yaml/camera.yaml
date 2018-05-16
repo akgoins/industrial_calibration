@@ -1,4 +1,4 @@
 # rgbd_depth_correction calibration file
-version: 1
-d1: -1.506564692812914
-d2: 1.63663260261862
+version: 2
+d1: -3.873374932063654
+d2: 3.449637431046022
